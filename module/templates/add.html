@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student Score</title>
+</head>
+<body>
+
+<h2>添加学生成绩</h2>
+
+<form action="/insert" method="post">
+    <label for="student_id">学生学号:</label>
+    <input type="text" id="student_id" name="student_id" required><br>
+
+    <label for="name">学生姓名:</label>
+    <input type="text" id="name" name="name" required><br>
+
+    <label for="score">学生分数:</label>
+    <input type="text" id="score" name="score" required><br>
+
+    <input type="submit" value="提交">
+</form>
+
+</body>
+</html>
