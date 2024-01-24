@@ -2,6 +2,7 @@ package module
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 )
@@ -85,32 +86,48 @@ func InsertRowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "解析表格失败", http.StatusBadRequest)
+			http.Error(w, "解析表单失败", http.StatusBadRequest)
 			return
 		}
-		number, err := strconv.Atoi(r.FormValue("student_id"))
+		numberStr := r.FormValue("student_id")
+		number, err := strconv.Atoi(numberStr)
 		if err != nil {
-			http.Error(w, "学号加入失败", http.StatusBadRequest)
+			http.Error(w, "学号错误", http.StatusBadRequest)
 		}
 		name := r.FormValue("name")
-		score, err := strconv.Atoi(r.FormValue("score"))
+		scoreStr := r.FormValue("score")
+		score, err := strconv.Atoi(scoreStr)
 		if err != nil {
-			http.Error(w, "无效的分数值", http.StatusBadRequest)
+			http.Error(w, "分数格式错误", http.StatusBadRequest)
+			return
 		}
 		err = insertRow(number, name, score)
 		if err != nil {
+			http.Error(w, "添加学生失败", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/choose", http.StatusSeeOther)
-		return
-	} else {
-		err := tpl.ExecuteTemplate(w, "add.html", nil)
+
+		//渲染成功信息的模板
+		tmpl, err := template.ParseFiles("module/templates/success.html") // 修改为实际的模板文件路径
 		if err != nil {
+			http.Error(w, "模板解析错误", http.StatusInternalServerError)
 			return
 		}
+
+		//使用模板渲染成功信息，并传递学生ID
+		data := struct {
+			InsertedID int
+		}{
+			InsertedID: number,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "模板渲染错误", http.StatusInternalServerError)
+		}
+	} else {
+		http.ServeFile(w, r, "module/templates/add.html") // 修改为实际的添加学生表单文件路径
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	return
 }
 
 // 修改学生信息的Handler
