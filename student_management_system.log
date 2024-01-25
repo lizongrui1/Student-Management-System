@@ -1,0 +1,11 @@
+2024/01/25 10:22:25 学生添加成功！
+2024/01/25 11:37:46 学生添加成功！
+2024/01/25 17:25:14 模板渲染错误：template: addsuccess.html:10:35: executing "addsuccess.html" at <.InsertedID>: can't evaluate field InsertedID in type struct { DeleteID int }
+2024/01/25 17:25:14 http: superfluous response.WriteHeader call from StudentManagementSystem/module.DeleteRowHandler (web.go:214)
+2024/01/25 17:25:14 http: superfluous response.WriteHeader call from StudentManagementSystem/module.DeleteRowHandler (web.go:216)
+2024/01/25 21:45:17 仅支持POST请求
+2024/01/25 21:46:16 无效的学生ID: strconv.Atoi: parsing "": invalid syntax
+2024/01/25 21:49:14 http: superfluous response.WriteHeader call from StudentManagementSystem/module.DeleteRowHandler (web.go:219)
+2024/01/25 21:54:36 学生添加成功！
+2024/01/25 21:56:18 学号为%v的学生删除成功！ 2403
+2024/01/26 01:18:07 模板解析错误：open module/templates/querysuccess.html: no such file or directory

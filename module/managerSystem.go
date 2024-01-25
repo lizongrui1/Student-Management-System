@@ -3,6 +3,7 @@ package module
 import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 var db, _ = InitDB()
@@ -10,23 +11,23 @@ var db, _ = InitDB()
 type myUsualType interface{}
 
 type Student struct {
-	Id    int
-	Name  string
-	Score int
+	Number int
+	Name   string
+	Score  int
 }
 
 //var stu = new(Student)
 
 // 查看学生
-func queryRow(id int) (student Student, err error) {
+func queryRow(number int) (student Student, err error) {
 	var stu Student
-	err = db.QueryRow("select * from `sms` where id=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
+	err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&stu.Number, &stu.Name, &stu.Score)
 	if err != nil {
 		fmt.Printf("查询失败, err: %v\n", err)
 		return
 	}
 	fmt.Println("查询成功!")
-	fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", stu.Id, stu.Name, stu.Score)
+	fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", stu.Number, stu.Name, stu.Score)
 	return stu, nil
 }
 
@@ -43,7 +44,7 @@ func queryMultiRow() ([]Student, error) {
 
 	for rows.Next() {
 		var stu Student // 使用Student结构体来存储每行的数据
-		err := rows.Scan(&stu.Id, &stu.Name, &stu.Score)
+		err := rows.Scan(&stu.Number, &stu.Name, &stu.Score)
 		if err != nil {
 			fmt.Printf("赋值失败, err:%v\n", err)
 			continue // 发生错误时继续处理下一行
@@ -61,6 +62,7 @@ func queryMultiRow() ([]Student, error) {
 
 // 增加学生
 func insertRow(number int, name string, score int) error {
+	currentTime := time.Now()
 	ret, err := db.Exec("INSERT INTO sms (number, name, score) VALUES (?, ?, ?)", number, name, score)
 	if err != nil {
 		fmt.Printf("添加失败, err:%v\n", err)
@@ -71,7 +73,7 @@ func insertRow(number int, name string, score int) error {
 		fmt.Printf("获取插入ID失败, err:%v\n", err)
 		return err
 	}
-	fmt.Printf("加入成功, 新加入的学生序号为：%d\n", insertedId)
+	fmt.Printf("%s 加入成功, 新加入的学生序号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), insertedId)
 	return nil
 }
 
@@ -96,8 +98,9 @@ func updateRow(name string, newValue myUsualType) error {
 	return nil
 }
 
-// 删除学生
+// 删除学生（TODO：删除前应该先查询还有没有那个学生了）
 func deleteRow(number int) (err error) {
+	currentTime := time.Now()
 	ret, err := db.Exec("DELETE FROM sms WHERE number = ?", number)
 	if err != nil {
 		fmt.Printf("删除失败, err:%v\n", err)
@@ -108,6 +111,6 @@ func deleteRow(number int) (err error) {
 		fmt.Printf("get RowsAffected failed, err:%v\n", err)
 		return
 	}
-	fmt.Printf("删除成功, 删除的学生学号为：%d，受影响行数:%d\n", number, n)
+	fmt.Printf("%s 删除成功, 删除的学生学号为：%d，受影响行数:%d\n", currentTime.Format("2006/01/02 15:04:05"), number, n)
 	return err
 }

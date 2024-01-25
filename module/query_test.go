@@ -24,7 +24,7 @@ func TestQueryRow(t *testing.T) {
 	if err != nil {
 		t.Errorf("期望无错误，但得到: %s", err)
 	}
-	if stu.Id != 1 || stu.Name != "Alice" || stu.Score != 90 {
+	if stu.Number != 1 || stu.Name != "Alice" || stu.Score != 90 {
 		t.Errorf("查询结果不符合预期: %+v", stu)
 	}
 

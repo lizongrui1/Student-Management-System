@@ -2,10 +2,14 @@ package main
 
 import (
 	"StudentManagementSystem/module"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
+
+//var logger *log.Logger
 
 func main() {
 	db, err := module.InitDB()
@@ -13,13 +17,33 @@ func main() {
 		log.Fatalf("数据库初始化失败: %v\n", err)
 		return
 	}
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+
+		}
+	}(db)
+
+	// 创建日志文件
+	file, err := os.OpenFile("student_management_system.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666) // 如果文件不存在就创建它，然后以只写模式打开，且写入的数据追加到文件末尾
+	if err != nil {
+		log.Fatal(err)
+	}
+	//logger = log.New(file, "<New>", log.Lshortfile|log.Ldate|log.Ltime)
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+
+		}
+	}(file)
+
+	// 设置日志输出到文件
+	log.SetOutput(file)
 
 	// 设置静态文件服务
 	fs := http.FileServer(http.Dir("./module/templates"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// 设置路由
 	http.HandleFunc("/", module.LoginHandler)
 	http.HandleFunc("/home", module.HomeHandler)
 	http.HandleFunc("/query", module.QueryRowHandler)
