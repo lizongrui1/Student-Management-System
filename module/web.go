@@ -12,7 +12,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "表单解析错误", http.StatusBadRequest)
+			http.Error(w, "T表单解析错误", http.StatusBadRequest)
 			return
 		}
 		userName := r.FormValue("username")
@@ -89,7 +89,6 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	// 加载并发送 choose.html 文件
 	http.ServeFile(w, r, "./module/templates/choose.html")
 }
 
