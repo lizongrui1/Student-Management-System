@@ -1,8 +1,11 @@
 package module
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"log"
 	"time"
 )
 
@@ -14,6 +17,11 @@ type Student struct {
 	Number int
 	Name   string
 	Score  int
+}
+
+type StudentID struct {
+	ID  int
+	pwd string
 }
 
 //var stu = new(Student)
@@ -98,19 +106,56 @@ func updateRow(name string, newValue myUsualType) error {
 	return nil
 }
 
-// 删除学生（TODO：删除前应该先查询还有没有那个学生了）
+// 删除学生（TODO：删除前应该先查询还有没有那个学生）
 func deleteRow(number int) (err error) {
 	currentTime := time.Now()
+
+	// 首先检查学生是否存在
+	_, err = queryRow(number)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Printf("没有找到学号为 %d 的学生\n", number)
+			return fmt.Errorf("没有找到学号为 %d 的学生", number)
+		}
+		fmt.Printf("查询学生时出错, err: %v\n", err)
+		return err
+	}
 	ret, err := db.Exec("DELETE FROM sms WHERE number = ?", number)
 	if err != nil {
 		fmt.Printf("删除失败, err:%v\n", err)
-		return
+		return err
 	}
 	n, err := ret.RowsAffected()
 	if err != nil {
 		fmt.Printf("get RowsAffected failed, err:%v\n", err)
-		return
+		return err
+	}
+	if n == 0 {
+		return fmt.Errorf("没有学号为 %d 的学生", number)
 	}
 	fmt.Printf("%s 删除成功, 删除的学生学号为：%d，受影响行数:%d\n", currentTime.Format("2006/01/02 15:04:05"), number, n)
-	return err
+	return nil
+}
+
+func StudentRegister(student_id int, pwd string) {
+
+}
+
+func StudentLogin(student_id int, pwd string) (stu StudentID, err error) {
+	err = db.QueryRow("SELECT student_id, password FROM stu WHERE student_id = ?", student_id).Scan(&stu.ID, &stu.pwd)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			log.Printf("StudentLogin: 学生ID不存在 - %d", student_id)
+			return stu, err
+		}
+		log.Printf("StudentLogin: 数据库查询错误: %v", err)
+		return stu, err
+	}
+	// TODO：比较密码应该使用密码哈希比较
+	if stu.pwd != pwd {
+		log.Printf("StudentLogin: 提供的密码不匹配 - %d", student_id)
+		return stu, fmt.Errorf("密码不匹配")
+	}
+	log.Printf("StudentLogin: 学生ID登录成功 - %d", student_id)
+	return stu, nil
 }

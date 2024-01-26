@@ -20,7 +20,7 @@ func main() {
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
-
+			log.Fatalf("数据库关闭失败，err%v\n", err)
 		}
 	}(db)
 
@@ -33,7 +33,7 @@ func main() {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-
+			log.Fatalf("日志关闭失败，err: %v\n", err)
 		}
 	}(file)
 
@@ -50,6 +50,7 @@ func main() {
 	http.HandleFunc("/insert", module.InsertRowHandler)
 	http.HandleFunc("/update", module.UpdateRowHandler)
 	http.HandleFunc("/delete", module.DeleteRowHandler)
+	//http.HandleFunc("/register", module.RegisterStudentHandler)
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

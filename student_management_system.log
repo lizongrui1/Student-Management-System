@@ -9,3 +9,16 @@
 2024/01/25 21:54:36 学生添加成功！
 2024/01/25 21:56:18 学号为%v的学生删除成功！ 2403
 2024/01/26 01:18:07 模板解析错误：open module/templates/querysuccess.html: no such file or directory
+2024/01/26 14:57:31 LoginHandler: 用户 user 登录成功
+2024/01/26 14:57:37 DeleteRowHandler: 学生删除失败: 没有找到学号为 2004 的学生
+2024/01/26 15:06:25 LoginHandler: 处理GET请求
+2024/01/26 15:06:28 学号为 2003 的学生删除成功！
+2024/01/26 15:51:48 LoginHandler: 处理GET请求
+2024/01/26 15:51:53 LoginHandler: 用户 user 登录成功
+2024/01/26 15:54:34 LoginHandler: 用户 user 登录成功
+2024/01/26 21:20:26 LoginHandler: 处理GET请求
+2024/01/26 21:20:35 LoginHandler: 处理GET请求
+2024/01/26 21:20:35 LoginHandler: 处理GET请求
+2024/01/26 21:20:40 LoginHandler: 处理GET请求
+2024/01/26 21:20:40 LoginHandler: 处理GET请求
+2024/01/26 21:32:09 LoginHandler: 用户名转换为学生ID时出错: strconv.Atoi: parsing "user": invalid syntax
