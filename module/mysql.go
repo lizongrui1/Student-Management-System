@@ -10,7 +10,7 @@ var tpl *template.Template
 
 func InitDB() (*sql.DB, error) {
 	tpl = template.Must(template.ParseGlob("/Users/lizongrui/Downloads/StudentManagementSystem/module/templates/*.html"))
-	db, err := sql.Open("mysql", "root:12345678@tcp(127.0.0.1:3306)/studb?charset=utf8")
+	db, err := sql.Open("mysql", "root:12345678@tcp(127.0.0.1:8080)/studb?charset=utf8")
 	if err != nil {
 		return nil, err
 	}

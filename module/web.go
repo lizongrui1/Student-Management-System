@@ -12,7 +12,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "T表单解析错误", http.StatusBadRequest)
+			http.Error(w, "表单解析错误", http.StatusBadRequest)
 			return
 		}
 		userName := r.FormValue("username")
@@ -33,7 +33,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, "登陆失败，请重新登陆")
 		}
 	} else {
-		http.ServeFile(w, r, "./module/templates/login.html")
+		http.ServeFile(w, r, "./module/templates/select.html")
 		return
 	}
 }
