@@ -26,14 +26,19 @@ type StudentID struct {
 
 //var stu = new(Student)
 
-func register(number int, password string) error {
+func register(number int, password string) (err error) {
 	currentTime := time.Now()
-	ret, err := db.Exec("insert into stu (student_id, password) values (?,?)", number, password)
+	ret, err := db.Exec("INSERT INTO stu (student_id, password) VALUES (?, ?)", number, password)
 	if err != nil {
-		log.Printf("学生账号添加失败", err)
+		log.Printf("学生账号添加失败: %v\n", err)
+		return
 	}
-	fmt.Printf("%s 注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), ret)
-	return nil
+	newID, err := ret.LastInsertId()
+	if err != nil {
+		log.Printf("获取新注册学生ID失败: %v\n", err)
+	}
+	log.Printf("%s 注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), newID)
+	return
 }
 
 // 查看学生
@@ -163,4 +168,19 @@ func StudentLogin(student_id int, pwd string) (stu StudentID, err error) {
 	}
 	log.Printf("StudentLogin: 学生ID登录成功 - %d", student_id)
 	return stu, nil
+}
+
+func validate(username, password string) (bool, error) {
+	var dbPassword string
+	err := db.QueryRow("SELECT password FROM stu WHERE student_id = ?", username).Scan(&dbPassword)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil // 用户名不存在
+		}
+		return false, err // 数据库查询出错
+	}
+	if password == dbPassword {
+		return true, nil
+	}
+	return false, nil
 }

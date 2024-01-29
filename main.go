@@ -50,7 +50,7 @@ func main() {
 	http.HandleFunc("/insert", module.InsertRowHandler)
 	http.HandleFunc("/update", module.UpdateRowHandler)
 	http.HandleFunc("/delete", module.DeleteRowHandler)
-	//http.HandleFunc("/register", module.RegisterStudentHandler)
+	http.HandleFunc("/register", module.RegisterStudentHandler)
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

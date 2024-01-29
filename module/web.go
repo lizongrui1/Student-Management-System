@@ -8,18 +8,33 @@ import (
 	"strconv"
 )
 
-//func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-//	if r.Method == http.MethodPost {
-//		err := r.ParseForm()
-//		if err != nil {
-//			http.Error(w, "表单解析错误", http.StatusBadRequest)
-//			return
-//		}
-//		student_id := r.FormValue("number")
-//		pwd := r.FormValue("password")
-//
-//	}
-//}
+func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "表单解析错误", http.StatusBadRequest)
+			return
+		}
+		idStr := r.FormValue("number")
+		student_id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "无效的学生ID", http.StatusBadRequest)
+			return
+		}
+		pwd := r.FormValue("password")
+		err = register(student_id, pwd)
+		if err != nil {
+			log.Printf("注册失败，err：%v\n", err)
+			http.Error(w, "注册失败", http.StatusInternalServerError)
+			return
+		}
+		// 显示注册成功消息
+		fmt.Fprint(w, "注册成功，请返回登录页面。")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	} else {
+		http.ServeFile(w, r, "./module/templates/studentRegister.html")
+	}
+}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
@@ -30,24 +45,26 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		userName := r.FormValue("username")
 		pwd := r.FormValue("password")
-
-		// 如果输入正确，则发送cookie 并给出反馈
-		if userName == "user" && pwd == "123" {
+		isValid, err := validate(userName, pwd)
+		if err != nil {
+			log.Printf("登录验证过程中出错：%v", err)
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
+		}
+		if isValid {
 			cookie := &http.Cookie{
 				Name:     "username",
 				Value:    userName,
-				MaxAge:   0, // cookie 的最大存活时间
+				MaxAge:   0,
 				HttpOnly: false,
 			}
 			http.SetCookie(w, cookie)
 			http.Redirect(w, r, "/home", http.StatusSeeOther)
-			return
 		} else {
-			fmt.Fprint(w, "登陆失败，请重新登陆")
+			fmt.Fprint(w, "登录失败，请重新登录。")
 		}
 	} else {
 		http.ServeFile(w, r, "./module/templates/select.html")
-		return
 	}
 }
 
@@ -295,29 +312,3 @@ func DeleteRowHandler(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./module/templates/delete.html")
 	}
 }
-
-//func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
-//	// 解析请求中的表单数据
-//	err := r.ParseForm()
-//	if err != nil {
-//		// 处理错误
-//	}
-//
-//	// 从表单中获取数据
-//	studentID := r.FormValue("student_id")
-//	password := r.FormValue("password")
-//
-//	// 对密码进行加密处理
-//	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-//	if err != nil {
-//		// 处理错误
-//	}
-//
-//	// 将数据存储到数据库
-//	_, err = db.Exec("INSERT INTO stu (id, name, password) VALUES (?, ?, ?)", studentID, name, hashedPassword)
-//	if err != nil {
-//		// 处理错误
-//	}
-//
-//	// 返回成功消息
-//}
