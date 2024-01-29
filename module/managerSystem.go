@@ -26,6 +26,16 @@ type StudentID struct {
 
 //var stu = new(Student)
 
+func register(number int, password string) error {
+	currentTime := time.Now()
+	ret, err := db.Exec("insert into stu (student_id, password) values (?,?)", number, password)
+	if err != nil {
+		log.Printf("学生账号添加失败", err)
+	}
+	fmt.Printf("%s 注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), ret)
+	return nil
+}
+
 // 查看学生
 func queryRow(number int) (student Student, err error) {
 	var stu Student
@@ -106,7 +116,7 @@ func updateRow(name string, newValue myUsualType) error {
 	return nil
 }
 
-// 删除学生（TODO：删除前应该先查询还有没有那个学生）
+// 删除学生
 func deleteRow(number int) (err error) {
 	currentTime := time.Now()
 
@@ -114,31 +124,26 @@ func deleteRow(number int) (err error) {
 	_, err = queryRow(number)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			fmt.Printf("没有找到学号为 %d 的学生\n", number)
 			return fmt.Errorf("没有找到学号为 %d 的学生", number)
 		}
 		fmt.Printf("查询学生时出错, err: %v\n", err)
-		return err
+		return
 	}
 	ret, err := db.Exec("DELETE FROM sms WHERE number = ?", number)
 	if err != nil {
 		fmt.Printf("删除失败, err:%v\n", err)
-		return err
+		return
 	}
 	n, err := ret.RowsAffected()
 	if err != nil {
 		fmt.Printf("get RowsAffected failed, err:%v\n", err)
-		return err
+		return
 	}
 	if n == 0 {
 		return fmt.Errorf("没有学号为 %d 的学生", number)
 	}
-	fmt.Printf("%s 删除成功, 删除的学生学号为：%d，受影响行数:%d\n", currentTime.Format("2006/01/02 15:04:05"), number, n)
-	return nil
-}
-
-func StudentRegister(student_id int, pwd string) {
-
+	fmt.Printf("%s 删除成功, 删除的学生学号为：%d", currentTime.Format("2006/01/02 15:04:05"), number)
+	return
 }
 
 func StudentLogin(student_id int, pwd string) (stu StudentID, err error) {

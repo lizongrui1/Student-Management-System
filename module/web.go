@@ -8,6 +8,19 @@ import (
 	"strconv"
 )
 
+//func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+//	if r.Method == http.MethodPost {
+//		err := r.ParseForm()
+//		if err != nil {
+//			http.Error(w, "表单解析错误", http.StatusBadRequest)
+//			return
+//		}
+//		student_id := r.FormValue("number")
+//		pwd := r.FormValue("password")
+//
+//	}
+//}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
@@ -260,8 +273,7 @@ func DeleteRowHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("删除失败: %v", err), http.StatusInternalServerError)
 			return
 		}
-		//渲染成功信息的模板
-		tmpl, err := template.ParseFiles("module/templates/deleteSuccess.html") // 修改为实际的模板文件路径
+		tmpl, err := template.ParseFiles("./module/templates/deleteSuccess.html")
 		if err != nil {
 			log.Printf("模板解析错误:%v\n", err)
 			http.Error(w, "模板解析错误", http.StatusInternalServerError)
@@ -280,7 +292,7 @@ func DeleteRowHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println("学号为", number, "的学生删除成功！")
 	} else {
-		http.ServeFile(w, r, "module/templates/delete.html")
+		http.ServeFile(w, r, "./module/templates/delete.html")
 	}
 }
 
