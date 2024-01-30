@@ -2,7 +2,6 @@ package module
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
@@ -24,9 +23,7 @@ type StudentID struct {
 	pwd string
 }
 
-//var stu = new(Student)
-
-func register(number int, password string) (err error) {
+func register(number string, password string) (err error) {
 	currentTime := time.Now()
 	ret, err := db.Exec("INSERT INTO stu (student_id, password) VALUES (?, ?)", number, password)
 	if err != nil {
@@ -84,47 +81,46 @@ func queryMultiRow() ([]Student, error) {
 }
 
 // 增加学生
-func insertRow(number int, name string, score int) error {
+func insertRow(number int, name string, score int) (err error) {
 	currentTime := time.Now()
 	ret, err := db.Exec("INSERT INTO sms (number, name, score) VALUES (?, ?, ?)", number, name, score)
 	if err != nil {
 		fmt.Printf("添加失败, err:%v\n", err)
-		return err
+		return
 	}
 	insertedId, err := ret.LastInsertId()
 	if err != nil {
 		fmt.Printf("获取插入ID失败, err:%v\n", err)
-		return err
+		return
 	}
 	fmt.Printf("%s 加入成功, 新加入的学生序号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), insertedId)
-	return nil
+	return
 }
 
 // 修改学生
-func updateRow(name string, newValue myUsualType) error {
+func updateRow(name string, newValue myUsualType) (err error) {
 	sqlStr := "UPDATE sms SET score = ? WHERE name = ?"
 	ret, err := db.Exec(sqlStr, newValue, name)
 	if err != nil {
 		fmt.Printf("更新失败, error: %v\n", err)
-		return err
+		return
 	}
 	rowsAffected, err := ret.RowsAffected()
 	if err != nil {
 		fmt.Printf("获取更新行数时发生错误: %v\n", err)
-		return err
+		return
 	}
 	if rowsAffected == 0 {
 		fmt.Println("没有找到对应的ID, 未进行更新")
-		return nil
+		return
 	}
 	fmt.Printf("更新成功, 受影响行数:%d\n", rowsAffected)
-	return nil
+	return
 }
 
 // 删除学生
 func deleteRow(number int) (err error) {
 	currentTime := time.Now()
-
 	// 首先检查学生是否存在
 	_, err = queryRow(number)
 	if err != nil {
@@ -149,25 +145,6 @@ func deleteRow(number int) (err error) {
 	}
 	fmt.Printf("%s 删除成功, 删除的学生学号为：%d", currentTime.Format("2006/01/02 15:04:05"), number)
 	return
-}
-
-func StudentLogin(student_id int, pwd string) (stu StudentID, err error) {
-	err = db.QueryRow("SELECT student_id, password FROM stu WHERE student_id = ?", student_id).Scan(&stu.ID, &stu.pwd)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			log.Printf("StudentLogin: 学生ID不存在 - %d", student_id)
-			return stu, err
-		}
-		log.Printf("StudentLogin: 数据库查询错误: %v", err)
-		return stu, err
-	}
-	// TODO：比较密码应该使用密码哈希比较
-	if stu.pwd != pwd {
-		log.Printf("StudentLogin: 提供的密码不匹配 - %d", student_id)
-		return stu, fmt.Errorf("密码不匹配")
-	}
-	log.Printf("StudentLogin: 学生ID登录成功 - %d", student_id)
-	return stu, nil
 }
 
 func validate(username, password string) (bool, error) {

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h2>学生信息表</h2>
+
+<table>
+    <tr>
+        <th>姓名</th>
+        <th>学号</th>
+        <th>成绩</th>
+    </tr>
+    <tr>
+        <td>{{.Name}}</td>
+        <td>{{.ID}}</td>
+        <td>{{.Score}}</td>
+    </tr>
+</table>
+
+</body>
+</html>

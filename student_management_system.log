@@ -1185,3 +1185,9 @@ net/http.(*conn).serve(0x140001ae990, {0x102e922d8, 0x1400018dc50})
 created by net/http.(*Server).Serve in goroutine 1
 	/usr/local/go/src/net/http/server.go:3086 +0x4cc
 2024/01/29 14:31:23 学号为 2010 的学生删除成功！
+2024/01/30 10:10:55 2024/01/30 10:10:55 注册成功, 新注册的学生学号为：0
+2024/01/30 10:10:55 http: superfluous response.WriteHeader call from StudentManagementSystem/module.RegisterStudentHandler (web.go:33)
+2024/01/30 10:24:40 2024/01/30 10:24:40 注册成功, 新注册的学生学号为：0
+2024/01/30 10:24:40 http: superfluous response.WriteHeader call from StudentManagementSystem/module.RegisterStudentHandler (web.go:33)
+2024/01/30 11:26:31 2024/01/30 11:26:31 注册成功, 新注册的学生学号为：0
+2024/01/30 11:26:31 http: superfluous response.WriteHeader call from StudentManagementSystem/module.RegisterStudentHandler (web.go:30)

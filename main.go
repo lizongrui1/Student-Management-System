@@ -9,18 +9,16 @@ import (
 	"os"
 )
 
-//var logger *log.Logger
-
 func main() {
 	db, err := module.InitDB()
 	if err != nil {
-		log.Fatalf("数据库初始化失败: %v\n", err)
+		log.Fatalf("数据库初始化失败，err:%v\n", err)
 		return
 	}
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
-			log.Fatalf("数据库关闭失败，err%v\n", err)
+			log.Fatalf("数据库关闭失败，err:%v\n", err)
 		}
 	}(db)
 
@@ -51,6 +49,7 @@ func main() {
 	http.HandleFunc("/update", module.UpdateRowHandler)
 	http.HandleFunc("/delete", module.DeleteRowHandler)
 	http.HandleFunc("/register", module.RegisterStudentHandler)
+	http.HandleFunc("/studentPage", module.StudentHandler)
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

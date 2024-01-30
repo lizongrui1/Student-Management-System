@@ -8,27 +8,24 @@ import (
 	"strconv"
 )
 
+func StudentHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "表单解析错误", http.StatusBadRequest)
+			log.Printf("表单解析错误，err:%v\n", err)
 			return
 		}
-		idStr := r.FormValue("number")
-		student_id, err := strconv.Atoi(idStr)
-		if err != nil {
-			http.Error(w, "无效的学生ID", http.StatusBadRequest)
-			return
-		}
+		student_id := r.FormValue("number")
 		pwd := r.FormValue("password")
 		err = register(student_id, pwd)
 		if err != nil {
-			log.Printf("注册失败，err：%v\n", err)
 			http.Error(w, "注册失败", http.StatusInternalServerError)
 			return
 		}
-		// 显示注册成功消息
 		fmt.Fprint(w, "注册成功，请返回登录页面。")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
@@ -40,11 +37,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "表单解析错误", http.StatusBadRequest)
+			log.Printf("表单解析错误，err:%v\n", err)
 			return
 		}
 		userName := r.FormValue("username")
 		pwd := r.FormValue("password")
+		action := r.FormValue("action") // 获取登录类型
 		isValid, err := validate(userName, pwd)
 		if err != nil {
 			log.Printf("登录验证过程中出错：%v", err)
@@ -52,14 +50,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if isValid {
-			cookie := &http.Cookie{
-				Name:     "username",
-				Value:    userName,
-				MaxAge:   0,
-				HttpOnly: false,
+			switch action {
+			case "学生登录":
+				http.Redirect(w, r, "/studentPage", http.StatusSeeOther)
+			case "管理员登录":
+				http.Redirect(w, r, "/home", http.StatusSeeOther)
+			default:
+				fmt.Fprint(w, "未知登录类型")
 			}
-			http.SetCookie(w, cookie)
-			http.Redirect(w, r, "/home", http.StatusSeeOther)
 		} else {
 			fmt.Fprint(w, "登录失败，请重新登录。")
 		}
@@ -119,7 +117,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	http.ServeFile(w, r, "./module/templates/choose.html")
+	http.ServeFile(w, r, "./module/templates/home.html")
 }
 
 func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
