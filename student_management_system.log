@@ -1191,3 +1191,22 @@ created by net/http.(*Server).Serve in goroutine 1
 2024/01/30 10:24:40 http: superfluous response.WriteHeader call from StudentManagementSystem/module.RegisterStudentHandler (web.go:33)
 2024/01/30 11:26:31 2024/01/30 11:26:31 注册成功, 新注册的学生学号为：0
 2024/01/30 11:26:31 http: superfluous response.WriteHeader call from StudentManagementSystem/module.RegisterStudentHandler (web.go:30)
+2024/01/30 14:55:50 查询失败，err：sql: no rows in result set
+2024/01/30 15:01:14 http: superfluous response.WriteHeader call from StudentManagementSystem/module.LoginHandler (web.go:66)
+2024/01/30 15:01:14 查询失败，err：sql: no rows in result set
+2024/01/30 15:01:29 http: superfluous response.WriteHeader call from StudentManagementSystem/module.LoginHandler (web.go:66)
+2024/01/30 15:01:29 查询失败，err：sql: no rows in result set
+2024/01/30 15:01:35 http: superfluous response.WriteHeader call from StudentManagementSystem/module.LoginHandler (web.go:66)
+2024/01/30 15:01:35 查询失败，err：sql: no rows in result set
+2024/01/30 15:01:41 http: superfluous response.WriteHeader call from StudentManagementSystem/module.LoginHandler (web.go:66)
+2024/01/30 15:01:41 查询失败，err：sql: no rows in result set
+2024/01/30 15:02:43 http: superfluous response.WriteHeader call from StudentManagementSystem/module.LoginHandler (web.go:66)
+2024/01/30 15:02:43 查询失败，err：sql: no rows in result set
+2024/01/30 15:02:47 http: superfluous response.WriteHeader call from StudentManagementSystem/module.LoginHandler (web.go:66)
+2024/01/30 15:02:47 查询失败，err：sql: no rows in result set
+2024/01/30 15:02:49 http: superfluous response.WriteHeader call from StudentManagementSystem/module.LoginHandler (web.go:66)
+2024/01/30 15:02:49 查询失败，err：sql: no rows in result set
+2024/01/30 15:23:51 查询失败，err：sql: no rows in result set
+2024/01/30 15:23:58 查询失败，err：sql: no rows in result set
+2024/01/30 15:25:00 查询失败，err：sql: no rows in result set
+2024/01/30 16:25:08 查询失败，err：sql: no rows in result set

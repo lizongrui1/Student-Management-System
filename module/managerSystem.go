@@ -46,8 +46,6 @@ func queryRow(number int) (student Student, err error) {
 		fmt.Printf("查询失败, err: %v\n", err)
 		return
 	}
-	fmt.Println("查询成功!")
-	fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", stu.Number, stu.Name, stu.Score)
 	return stu, nil
 }
 

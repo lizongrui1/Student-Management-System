@@ -8,8 +8,46 @@ import (
 	"strconv"
 )
 
-func StudentHandler(w http.ResponseWriter, r *http.Request) {
-
+func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		cookie, err := r.Cookie("student_id")
+		if err != nil {
+			// 处理cookie不存在的情况
+			http.Error(w, "未授权访问", http.StatusUnauthorized)
+			return
+		}
+		number, err := strconv.Atoi(cookie.Value)
+		if err != nil {
+			http.Error(w, "无效的学生ID", http.StatusBadRequest)
+			return
+		}
+		stu, err := queryRow(number)
+		if err != nil {
+			log.Printf("查询失败，err：%v\n", err)
+			http.Error(w, "查询失败", http.StatusInternalServerError)
+			return
+		}
+		tmpl, err := template.ParseFiles("./module/templates/studentPage.html")
+		if err != nil {
+			log.Printf("模板解析错误：%v\n", err)
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
+		}
+		data := struct {
+			Name   string
+			Number int
+			Score  int
+		}{
+			Name:   stu.Name,
+			Number: stu.Number,
+			Score:  stu.Score,
+		}
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			log.Printf("模板渲染错误，err：%v\n", err)
+			return
+		}
+	}
 }
 
 func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +75,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
-			log.Printf("表单解析错误，err:%v\n", err)
+			log.Printf("表单解析错误，err：%v\n", err)
 			return
 		}
 		userName := r.FormValue("username")
@@ -52,6 +90,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if isValid {
 			switch action {
 			case "学生登录":
+				// 设置cookie
+				http.SetCookie(w, &http.Cookie{
+					Name:  "student_id",
+					Value: userName,
+					Path:  "/",
+				})
 				http.Redirect(w, r, "/studentPage", http.StatusSeeOther)
 			case "管理员登录":
 				http.Redirect(w, r, "/home", http.StatusSeeOther)
@@ -61,6 +105,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			fmt.Fprint(w, "登录失败，请重新登录。")
 		}
+
 	} else {
 		http.ServeFile(w, r, "./module/templates/select.html")
 	}
