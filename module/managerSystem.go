@@ -18,10 +18,10 @@ type Student struct {
 	Score  int
 }
 
-type StudentID struct {
-	ID  int
-	pwd string
-}
+//type StudentID struct {
+//	ID  int
+//	pwd string
+//}
 
 func register(number string, password string) (err error) {
 	currentTime := time.Now()
@@ -32,9 +32,9 @@ func register(number string, password string) (err error) {
 	}
 	newID, err := ret.LastInsertId()
 	if err != nil {
-		log.Printf("获取新注册学生ID失败: %v\n", err)
+		log.Printf("新注册学生ID失败: %v\n", err)
 	}
-	log.Printf("%s 注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), newID)
+	log.Printf("%s注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), newID)
 	return
 }
 
@@ -51,31 +51,27 @@ func queryRow(number int) (student Student, err error) {
 
 // 全部查看
 func queryMultiRow() ([]Student, error) {
-	rows, err := db.Query("SELECT * FROM sms")
+	var students []Student
+	ret, err := db.Query("SELECT number, name, score FROM sms")
 	if err != nil {
-		fmt.Printf("查询失败, err:%v\n", err)
+		log.Printf("查询失败, err:%v\n", err)
 		return nil, err
 	}
-	defer rows.Close()
-
-	var students []Student // 创建一个空的Student切片用于存储学生数据
-
-	for rows.Next() {
-		var stu Student // 使用Student结构体来存储每行的数据
-		err := rows.Scan(&stu.Number, &stu.Name, &stu.Score)
+	defer ret.Close()
+	for ret.Next() {
+		var stu Student
+		err := ret.Scan(&stu.Number, &stu.Name, &stu.Score)
 		if err != nil {
-			fmt.Printf("赋值失败, err:%v\n", err)
-			continue // 发生错误时继续处理下一行
+			log.Printf("赋值失败, err:%v\n", err)
+			continue
 		}
-		students = append(students, stu) // 将学生对象添加到切片中
+		students = append(students, stu)
 	}
-
-	if err := rows.Err(); err != nil {
-		fmt.Printf("iteration failed, err:%v\n", err)
+	if err := ret.Err(); err != nil {
+		log.Printf("迭代失败, err:%v\n", err)
 		return nil, err
 	}
-
-	return students, nil // 返回学生切片和错误信息
+	return students, nil
 }
 
 // 增加学生

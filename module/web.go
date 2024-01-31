@@ -61,11 +61,11 @@ func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
 		pwd := r.FormValue("password")
 		err = register(student_id, pwd)
 		if err != nil {
-			http.Error(w, "注册失败", http.StatusInternalServerError)
+			http.Error(w, "注册失败，请重新输入正确的学号或密码", http.StatusInternalServerError)
 			return
 		}
 		fmt.Fprint(w, "注册成功，请返回登录页面。")
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
 	} else {
 		http.ServeFile(w, r, "./module/templates/studentRegister.html")
 	}
@@ -80,7 +80,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		userName := r.FormValue("username")
 		pwd := r.FormValue("password")
-		action := r.FormValue("action") // 获取登录类型
+		action := r.FormValue("action")
 		isValid, err := validate(userName, pwd)
 		if err != nil {
 			log.Printf("登录验证过程中出错：%v", err)
@@ -103,58 +103,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, "未知登录类型")
 			}
 		} else {
-			fmt.Fprint(w, "登录失败，请重新登录。")
+			fmt.Fprint(w, "学号或者密码错误，请重新登录。")
 		}
 
 	} else {
 		http.ServeFile(w, r, "./module/templates/select.html")
 	}
 }
-
-//func LoginHandler(w http.ResponseWriter, r *http.Request) {
-//	if r.Method == http.MethodPost {
-//		err := r.ParseForm()
-//		if err != nil {
-//			log.Printf("LoginHandler: 表单解析错误: %v", err)
-//			http.Error(w, "表单解析错误", http.StatusBadRequest)
-//			return
-//		}
-//		userName := r.FormValue("username")
-//		pwd := r.FormValue("password")
-//		studentID, err := strconv.Atoi(userName)
-//		if err != nil {
-//			log.Printf("LoginHandler: 用户名转换为学生ID时出错: %v", err)
-//			http.Error(w, "无效的用户名", http.StatusBadRequest)
-//			return
-//		}
-//		_, err = StudentLogin(studentID, pwd)
-//		if err != nil {
-//			if errors.Is(err, sql.ErrNoRows) || err.Error() == "密码不匹配" {
-//				log.Printf("LoginHandler: 登录失败 - 用户名或密码错误: %v", err)
-//				http.Error(w, "用户名或密码错误", http.StatusUnauthorized)
-//				return
-//			}
-//			log.Printf("LoginHandler: 登录时出错: %v", err)
-//			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
-//			return
-//		}
-//
-//		log.Printf("LoginHandler: 用户 %s 登录成功", userName)
-//		cookie := &http.Cookie{
-//			Name:     "username",
-//			Value:    userName,
-//			MaxAge:   0,
-//			HttpOnly: false,
-//		}
-//		http.SetCookie(w, cookie)
-//		http.Redirect(w, r, "/home", http.StatusSeeOther)
-//		return
-//	} else {
-//		log.Println("LoginHandler: 处理GET请求")
-//		http.ServeFile(w, r, "./module/templates/select.html")
-//		return
-//	}
-//}
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	// 确保只有根路径 "/" 被这个处理器处理
@@ -188,7 +143,7 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 在模板中使用查询结果
-	tmpl, err := template.ParseFiles("module/templates/querySuccess.html")
+	tmpl, err := template.ParseFiles("./module/templates/querySuccess.html")
 	if err != nil {
 		log.Printf("模板解析错误：%v\n", err)
 		http.Error(w, fmt.Sprintf("模板解析错误: %v", err), http.StatusInternalServerError)
@@ -208,6 +163,29 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "模板渲染错误", http.StatusInternalServerError)
 		return
 	}
+}
+
+func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		students, err := queryMultiRow()
+		if err != nil {
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
+		}
+		tmpl, err := template.ParseFiles("module/templates/queryAll.html")
+		if err != nil {
+			log.Printf("模板解析错误: %v\n", err)
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
+		}
+		err = tmpl.Execute(w, students)
+		if err != nil {
+			log.Printf("模板执行错误: %v\n", err)
+			http.Error(w, "模板渲染错误", http.StatusInternalServerError)
+		}
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return
 }
 
 // 添加学生信息的Handler
@@ -310,7 +288,7 @@ func UpdateRowHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// 删除学生信息的Handler
+// 删除学生信息
 func DeleteRowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		err := r.ParseForm()
@@ -326,7 +304,6 @@ func DeleteRowHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "无效的学生ID", http.StatusBadRequest)
 			return
 		}
-		// 调用deleteRow来删除学生
 		if err := deleteRow(number); err != nil {
 			log.Printf("DeleteRowHandler: 学生删除失败: %v", err)
 			// 如果删除过程中出现错误，返回内部服务器错误

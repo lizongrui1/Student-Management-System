@@ -45,6 +45,7 @@ func main() {
 	http.HandleFunc("/", module.LoginHandler)
 	http.HandleFunc("/home", module.HomeHandler)
 	http.HandleFunc("/query", module.QueryRowHandler)
+	http.HandleFunc("/queryAll", module.QueryAllRowHandler)
 	http.HandleFunc("/insert", module.InsertRowHandler)
 	http.HandleFunc("/update", module.UpdateRowHandler)
 	http.HandleFunc("/delete", module.DeleteRowHandler)
