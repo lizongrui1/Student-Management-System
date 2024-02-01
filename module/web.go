@@ -166,7 +166,7 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method == "GET" {
 		students, err := queryMultiRow()
 		if err != nil {
 			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
@@ -184,9 +184,10 @@ func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "模板渲染错误", http.StatusInternalServerError)
 		}
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	return
 }
+
+//http.Redirect(w, r, "/", http.StatusSeeOther)
+//return
 
 // 添加学生信息的Handler
 func InsertRowHandler(w http.ResponseWriter, r *http.Request) {
@@ -217,8 +218,7 @@ func InsertRowHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("InsertRowHandler: 学生添加成功，学号: %d", number)
-		//渲染成功信息的模板
-		tmpl, err := template.ParseFiles("module/templates/addSuccess.html") // 修改为实际的模板文件路径
+		tmpl, err := template.ParseFiles("./module/templates/addSuccess.html")
 		if err != nil {
 			log.Printf("InsertRowHandler：模板解析错误:%v\n", err)
 			http.Error(w, "模板解析错误", http.StatusInternalServerError)
@@ -230,7 +230,6 @@ func InsertRowHandler(w http.ResponseWriter, r *http.Request) {
 		}{
 			InsertedID: number,
 		}
-
 		err = tmpl.Execute(w, data)
 		if err != nil {
 			log.Printf("InsertRowHandler：模板渲染错误：%v\n", err)
