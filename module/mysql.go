@@ -20,9 +20,5 @@ func InitDB() (*sql.DB, error) {
 		}
 		return nil, err
 	}
-	_, err = db.Exec("USE studb")
-	if err != nil {
-		return nil, err
-	}
 	return db, nil
 }

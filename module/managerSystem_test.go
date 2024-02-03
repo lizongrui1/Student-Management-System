@@ -2,6 +2,7 @@ package module
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"testing"
@@ -17,6 +18,7 @@ func initDB() *sql.DB {
 	if err != nil {
 		log.Fatalf("无法连接数据库: %s", err)
 	}
+
 	return db
 }
 
@@ -75,4 +77,30 @@ func TestQueryMultiRow(t *testing.T) {
 	if found != len(expectedStudents) {
 		t.Errorf("预期查询到的特定学生数量: %d, 实际查询到的特定学生数量: %d", len(expectedStudents), found)
 	}
+}
+
+func TestDeleteRow(t *testing.T) {
+	db := initDB()
+	defer db.Close()
+	err := setup(db)
+	if err != nil {
+		t.Fatalf("设置测试数据失败: %s", err)
+	}
+	defer func() {
+		err := deleteData(db)
+		if err != nil {
+			t.Errorf("删除测试数据失败: %v", err)
+		}
+	}()
+	number := 9997
+	err = deleteRow(number)
+	if err != nil {
+		t.Errorf("Expected nil error, got %v", err)
+	}
+	numberNotExists := 12345
+	err = deleteRow(numberNotExists)
+	if err == nil || err.Error() != fmt.Sprintf("没有找到学号为 %d 的学生", numberNotExists) {
+		t.Errorf("错误： '没有找到学号为 %d 的学生', 错误为： %v", numberNotExists, err)
+	}
+
 }
