@@ -253,36 +253,34 @@ func UpdateRowHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "解析表格失败", http.StatusBadRequest)
 			return
 		}
-		name := r.FormValue("name")
+		number, err := strconv.Atoi(r.FormValue("number"))
 		score, err := strconv.Atoi(r.FormValue("score"))
 		if err != nil {
-			log.Printf("UpdateRowHandler: 无效的分数值,err:%v\n", err)
 			http.Error(w, "无效的分数值", http.StatusBadRequest)
 			return
 		}
-		err = updateRow(name, score)
+		err = updateRow(number, score)
 		if err != nil {
 			log.Printf("UpdateRowHandler: 更新学生信息失败: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	} /*else {
-		GET请求（读）
-		id, err := strconv.Atoi(r.FormValue("id"))
+		data := struct {
+			InsertedID int
+			Score      int
+		}{
+			InsertedID: number,
+			Score:      score,
+		}
+		tmpl, err := template.ParseFiles("./module/templates/updateSuccess.html")
+		err = tmpl.Execute(w, data)
 		if err != nil {
-			http.Error(w, "无效的学生ID值", http.StatusBadRequest)
+			log.Printf("InsertRowHandler：模板渲染错误：%v\n", err)
+			http.Error(w, "模板渲染错误", http.StatusInternalServerError)
 			return
 		}
-		err = queryRow(id)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		err = tpl.ExecuteTemplate(w, "update.html", nil)
-		if err != nil {
-			return
-		}
-	}*/
+		log.Println("InsertRowHandler：学生添加成功！")
+	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return
 }
