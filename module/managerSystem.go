@@ -92,9 +92,9 @@ func insertRow(number int, name string, score int) (err error) {
 }
 
 // 修改学生
-func updateRow(name string, newValue myUsualType) (err error) {
+func updateRow(name string, newScore myUsualType) (err error) {
 	sqlStr := "UPDATE sms SET score = ? WHERE name = ?"
-	ret, err := db.Exec(sqlStr, newValue, name)
+	ret, err := db.Exec(sqlStr, newScore, name)
 	if err != nil {
 		fmt.Printf("更新失败, error: %v\n", err)
 		return

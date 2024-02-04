@@ -95,12 +95,63 @@ func TestDeleteRow(t *testing.T) {
 	number := 9997
 	err = deleteRow(number)
 	if err != nil {
-		t.Errorf("Expected nil error, got %v", err)
+		t.Errorf("错误为： %v", err)
 	}
 	numberNotExists := 12345
 	err = deleteRow(numberNotExists)
 	if err == nil || err.Error() != fmt.Sprintf("没有找到学号为 %d 的学生", numberNotExists) {
 		t.Errorf("错误： '没有找到学号为 %d 的学生', 错误为： %v", numberNotExists, err)
 	}
+}
 
+func TestUpdateRow(t *testing.T) {
+	db := initDB()
+	defer db.Close()
+	err := setup(db)
+	if err != nil {
+		t.Fatalf("设置测试数据失败: %s", err)
+	}
+	defer deleteData(db)
+	originalStudent, err := queryRow(9997)
+	if err != nil {
+		t.Fatalf("查询原始学生信息失败: %s", err)
+	}
+	newScore := 95
+	err = updateRow("测试1", newScore)
+	if err != nil {
+		t.Fatalf("更新学生信息失败: %s", err)
+	}
+	updatedStudent, err := queryRow(9997)
+	if err != nil {
+		t.Fatalf("查询更新后的学生信息失败: %s", err)
+	}
+	if updatedStudent.Score != newScore {
+		t.Errorf("预期得到的分数: %d, 实际得到的分数: %d", newScore, updatedStudent.Score)
+	}
+	if updatedStudent.Number != originalStudent.Number || updatedStudent.Name != originalStudent.Name {
+		t.Errorf("学生的其他信息发生了不期望的变化")
+	}
+}
+
+func TestInsertRow(t *testing.T) {
+	db := initDB()
+	defer db.Close()
+	err := insertRow(10000, "测试4", 90)
+	if err != nil {
+		t.Fatalf("测试数据添加错误，错误为：%s\n", err)
+	}
+	defer func() {
+		// 删除测试数据
+		err := deleteRow(10000)
+		if err != nil {
+			t.Errorf("测试数据删除失败，错误为：%s\n", err)
+		}
+	}()
+	stu, err := queryRow(10000)
+	if err != nil {
+		t.Errorf("查询添加后的测试数据错误，错误为：%s\n", err)
+	}
+	if stu.Number != 10000 || stu.Name != "测试4" || stu.Score != 90 {
+		t.Errorf("测试数据添加失败，请检查失败原因")
+	}
 }
