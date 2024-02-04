@@ -163,6 +163,9 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "模板渲染错误", http.StatusInternalServerError)
 		return
 	}
+	//else {
+	//	http.ServeFile(w, r, "./module/templates/query.html")
+	//}
 }
 
 func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {
@@ -254,6 +257,10 @@ func UpdateRowHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		number, err := strconv.Atoi(r.FormValue("number"))
+		if err != nil {
+			http.Error(w, "无效的学号", http.StatusBadRequest)
+			return
+		}
 		score, err := strconv.Atoi(r.FormValue("score"))
 		if err != nil {
 			http.Error(w, "无效的分数值", http.StatusBadRequest)
@@ -265,6 +272,7 @@ func UpdateRowHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		tmpl, err := template.ParseFiles("./module/templates/updateSuccess.html")
 		data := struct {
 			InsertedID int
 			Score      int
@@ -272,17 +280,16 @@ func UpdateRowHandler(w http.ResponseWriter, r *http.Request) {
 			InsertedID: number,
 			Score:      score,
 		}
-		tmpl, err := template.ParseFiles("./module/templates/updateSuccess.html")
 		err = tmpl.Execute(w, data)
 		if err != nil {
 			log.Printf("InsertRowHandler：模板渲染错误：%v\n", err)
 			http.Error(w, "模板渲染错误", http.StatusInternalServerError)
 			return
 		}
-		log.Println("InsertRowHandler：学生添加成功！")
+		log.Println("UpdateRowHandler：学生成绩修改成功！")
+	} else {
+		http.ServeFile(w, r, "./module/templates/update.html")
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	return
 }
 
 // 删除学生信息
