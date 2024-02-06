@@ -8,6 +8,13 @@ import (
 	"testing"
 )
 
+//type DataStore interface {
+//	QueryRow(number int) (Student, error)
+//}
+//
+//type MockDataStore struct {
+//}
+
 func initDB() *sql.DB {
 	//wd, err := os.Getwd()
 	//if err != nil {
@@ -117,7 +124,7 @@ func TestUpdateRow(t *testing.T) {
 		t.Fatalf("查询原始学生信息失败: %s", err)
 	}
 	newScore := 95
-	err = updateRow("测试1", newScore)
+	err = updateRow(88, newScore)
 	if err != nil {
 		t.Fatalf("更新学生信息失败: %s", err)
 	}
