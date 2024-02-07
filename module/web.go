@@ -1,6 +1,7 @@
 package module
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
@@ -81,7 +82,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		userName := r.FormValue("username")
 		pwd := r.FormValue("password")
 		action := r.FormValue("action")
-		isValid, err := validate(userName, pwd)
+		var userType string
+		switch action {
+		case "学生登录":
+			userType = "student"
+		case "管理员登录":
+			userType = "teacher"
+		default:
+			fmt.Fprint(w, "未知登录类型")
+			return
+		}
+		isValid, err := validate(userName, pwd, userType)
 		if err != nil {
 			log.Printf("登录验证过程中出错：%v", err)
 			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
@@ -90,7 +101,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if isValid {
 			switch action {
 			case "学生登录":
-				// 设置cookie
 				http.SetCookie(w, &http.Cookie{
 					Name:  "student_id",
 					Value: userName,
@@ -98,16 +108,18 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				})
 				http.Redirect(w, r, "/studentPage", http.StatusSeeOther)
 			case "管理员登录":
+				http.SetCookie(w, &http.Cookie{
+					Name:  "teacher_id",
+					Value: userName,
+					Path:  "/",
+				})
 				http.Redirect(w, r, "/home", http.StatusSeeOther)
-			default:
-				fmt.Fprint(w, "未知登录类型")
 			}
 		} else {
-			fmt.Fprint(w, "学号或者密码错误，请重新登录。")
+			fmt.Fprint(w, "用户名或者密码错误，请重新登录。")
 		}
-
 	} else {
-		http.ServeFile(w, r, "./module/templates/select.html")
+		http.ServeFile(w, r, "./module/templates/login.html")
 	}
 }
 
@@ -335,4 +347,26 @@ func DeleteRowHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.ServeFile(w, r, "./module/templates/delete.html")
 	}
+}
+
+func validate(username, password, userType string) (bool, error) {
+	var dbPassword string
+	var err error
+	if userType == "student" {
+		err = db.QueryRow("SELECT password FROM stu WHERE student_id = ?", username).Scan(&dbPassword)
+	} else if userType == "teacher" {
+		err = db.QueryRow("SELECT password FROM teachers WHERE tname = ?", username).Scan(&dbPassword)
+	} else {
+		return false, fmt.Errorf("未知的用户类型: %s", userType)
+	}
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil // 用户名不存在
+		}
+		return false, err // 数据库查询出错
+	}
+	if password == dbPassword {
+		return true, nil
+	}
+	return false, nil
 }

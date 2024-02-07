@@ -140,18 +140,3 @@ func deleteRow(number int) (err error) {
 	fmt.Printf("%s 删除成功, 删除的学生学号为：%d", currentTime.Format("2006/01/02 15:04:05"), number)
 	return
 }
-
-func validate(username, password string) (bool, error) {
-	var dbPassword string
-	err := db.QueryRow("SELECT password FROM stu WHERE student_id = ?", username).Scan(&dbPassword)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return false, nil // 用户名不存在
-		}
-		return false, err // 数据库查询出错
-	}
-	if password == dbPassword {
-		return true, nil
-	}
-	return false, nil
-}
