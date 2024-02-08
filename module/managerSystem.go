@@ -1,8 +1,10 @@
 package module
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"time"
@@ -16,6 +18,28 @@ type Student struct {
 	Number int
 	Name   string
 	Score  int
+}
+
+var rdb *redis.Client
+
+// 初始化 Redis 连接
+func init() {
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if _, err := rdb.Ping(ctx).Result(); err != nil {
+		log.Fatalf("无法连接到Redis: %v", err)
+	}
+
+	var err error
+	db, err = InitDB()
+	if err != nil {
+		log.Fatalf("无法连接到MySQL数据库: %v", err)
+	}
 }
 
 //type StudentID struct {
