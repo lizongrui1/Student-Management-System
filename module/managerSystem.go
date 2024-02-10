@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
@@ -63,14 +64,43 @@ func register(number string, password string) (err error) {
 }
 
 // 查看学生
+//
+//	func queryRow(number int) (student Student, err error) {
+//		var stu Student
+//		err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&stu.Number, &stu.Name, &stu.Score)
+//		if err != nil {
+//			fmt.Printf("查询失败, err: %v\n", err)
+//			return
+//		}
+//		return stu, nil
+//	}
 func queryRow(number int) (student Student, err error) {
-	var stu Student
-	err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&stu.Number, &stu.Name, &stu.Score)
-	if err != nil {
-		fmt.Printf("查询失败, err: %v\n", err)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	val, err := rdb.Get(ctx, fmt.Sprintf("student:%d", number)).Result()
+	if err == redis.Nil {
+		err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&student.Number, &student.Name, &student.Score)
+		if err != nil {
+			fmt.Printf("查询失败, err: %v\n", err)
+			return
+		}
+		studentJSON, _ := json.Marshal(student)
+		err = rdb.Set(ctx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
+		if err != nil {
+			log.Printf("缓存设置失败, err: %v\n", err)
+		}
+		return student, nil
+	} else if err != nil {
+		log.Printf("从Redis查询失败, err: %v\n", err)
 		return
+	} else {
+		err = json.Unmarshal([]byte(val), &student)
+		if err != nil {
+			log.Printf("反序列化失败, err: %v\n", err)
+			return
+		}
+		return student, nil
 	}
-	return stu, nil
 }
 
 // 全部查看
