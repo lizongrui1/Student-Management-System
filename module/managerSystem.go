@@ -16,7 +16,7 @@ var db, _ = InitDB()
 type myUsualType interface{}
 
 type Student struct {
-	Number int
+	Number int `json:"number"`
 	Name   string
 	Score  int
 }
@@ -150,19 +150,38 @@ func updateRow(number int, newScore myUsualType) (err error) {
 	sqlStr := "UPDATE sms SET score = ? WHERE number = ?"
 	ret, err := db.Exec(sqlStr, newScore, number)
 	if err != nil {
-		fmt.Printf("更新失败, error: %v\n", err)
+		log.Fatalf("更新失败, error: %v\n", err)
 		return
 	}
 	rowsAffected, err := ret.RowsAffected()
 	if err != nil {
-		fmt.Printf("获取更新行数时发生错误: %v\n", err)
+		log.Printf("获取更新行数时发生错误: %v\n", err)
 		return
 	}
 	if rowsAffected == 0 {
-		fmt.Println("没有找到对应的ID, 未进行更新")
+		fmt.Println("没有找到对应的学号, 未进行更新")
 		return
 	}
 	fmt.Printf("更新成功, 受影响行数:%d\n", rowsAffected)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	student, err := queryRow(number)
+	if err != nil {
+		log.Printf("从数据库获取更新后的学生信息失败, err: %v\n", err)
+		return
+	}
+
+	studentJSON, err := json.Marshal(student)
+	if err != nil {
+		log.Printf("序列化学生信息失败, err: %v\n", err)
+		return
+	}
+
+	err = rdb.Set(ctx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
+	if err != nil {
+		log.Printf("更新Redis缓存失败, err: %v\n", err)
+		return
+	}
 	return
 }
 
