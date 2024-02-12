@@ -26,6 +26,7 @@ var rdb *redis.Client
 // 初始化 Redis 连接
 func init() {
 	rdb = redis.NewClient(&redis.Options{
+		Network:  "tcp",
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
@@ -46,6 +47,15 @@ func init() {
 //type StudentID struct {
 //	ID  int
 //	pwd string
+//}
+
+//func ping(rdb *redis.Client) error {
+//	pong, err := rdb.Ping().Result()
+//	if err != nil {
+//		return err
+//	}
+//	fmt.Println(pong, err)
+//	return nil
 //}
 
 func register(number string, password string) (err error) {
@@ -81,7 +91,7 @@ func queryRow(number int) (student Student, err error) {
 	if err == redis.Nil {
 		err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&student.Number, &student.Name, &student.Score)
 		if err != nil {
-			fmt.Printf("查询失败, err: %v\n", err)
+			log.Fatalf("查询失败, err: %v\n", err)
 			return
 		}
 		studentJSON, _ := json.Marshal(student)
