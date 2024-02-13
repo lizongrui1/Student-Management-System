@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"log"
 	"time"
@@ -14,44 +13,15 @@ import (
 
 var db, _ = InitDB()
 
+var rdb *redis.Client
+var ctx = context.Background()
+
 type myUsualType interface{}
 
 type Student struct {
 	Number int `json:"number"`
 	Name   string
 	Score  int
-}
-
-var rdb *redis.Client
-
-// 初始化 Redis 连接
-func init() {
-	rdb = redis.NewClient(&redis.Options{
-		Network:  "tcp",
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
-	// 启用跟踪仪器。
-	if err := redisotel.InstrumentTracing(rdb); err != nil {
-		log.Fatalf("无法为Redis启用跟踪: %v", err)
-	}
-	// 启用指标仪器。
-	if err := redisotel.InstrumentMetrics(rdb); err != nil {
-		log.Fatalf("无法为Redis启用指标: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if _, err := rdb.Ping(ctx).Result(); err != nil {
-		log.Fatalf("无法连接到Redis: %v", err)
-	}
-
-	var err error
-	db, err = InitDB()
-	if err != nil {
-		log.Fatalf("无法连接到MySQL数据库: %v", err)
-	}
 }
 
 func register(number string, password string) (err error) {
@@ -81,9 +51,9 @@ func register(number string, password string) (err error) {
 //		return stu, nil
 //	}
 func queryRow(number int) (student Student, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	val, err := rdb.Get(ctx, fmt.Sprintf("student:%d", number)).Result()
+	val, err := rdb.Get(timeoutCtx, fmt.Sprintf("student:%d", number)).Result()
 	if err == redis.Nil {
 		err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&student.Number, &student.Name, &student.Score)
 		if err != nil {
@@ -91,7 +61,7 @@ func queryRow(number int) (student Student, err error) {
 			return
 		}
 		studentJSON, _ := json.Marshal(student)
-		err = rdb.Set(ctx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
+		err = rdb.Set(timeoutCtx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
 		if err != nil {
 			log.Printf("缓存设置失败, err: %v\n", err)
 		}
@@ -169,7 +139,7 @@ func updateRow(number int, newScore myUsualType) (err error) {
 		return
 	}
 	fmt.Printf("更新成功, 受影响行数:%d\n", rowsAffected)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	student, err := queryRow(number)
 	if err != nil {
@@ -183,7 +153,7 @@ func updateRow(number int, newScore myUsualType) (err error) {
 		return
 	}
 
-	err = rdb.Set(ctx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
+	err = rdb.Set(timeoutCtx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
 	if err != nil {
 		log.Printf("更新Redis缓存失败, err: %v\n", err)
 		return

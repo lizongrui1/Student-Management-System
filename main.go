@@ -4,12 +4,15 @@ import (
 	"StudentManagementSystem/module"
 	"database/sql"
 	"fmt"
+	"github.com/redis/go-redis/extra/redisotel/v9"
+	"github.com/redis/go-redis/v9"
 	"log"
 	"net/http"
 	"os"
 )
 
 func main() {
+	//mysql
 	db, err := module.InitDB()
 	if err != nil {
 		log.Fatalf("数据库初始化失败，err:%v\n", err)
@@ -21,6 +24,24 @@ func main() {
 			log.Fatalf("数据库关闭失败，err:%v\n", err)
 		}
 	}(db)
+	//redis
+	err = module.InitRDB()
+	if err := module.InitRDB(); err != nil {
+		log.Fatalf("初始化失败: %v", err)
+	}
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	// 启用跟踪仪器
+	if err := redisotel.InstrumentTracing(rdb); err != nil {
+		log.Fatalf("无法为Redis启用跟踪: %v", err)
+	}
+	// 启用指标仪器
+	if err := redisotel.InstrumentMetrics(rdb); err != nil {
+		log.Fatalf("无法为Redis启用指标: %v", err)
+	}
 
 	// 创建日志文件
 	file, err := os.OpenFile("student_management_system.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666) // 如果文件不存在就创建它，然后以只写模式打开，且写入的数据追加到文件末尾
