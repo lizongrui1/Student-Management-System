@@ -133,51 +133,49 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "仅支持POST请求", http.StatusMethodNotAllowed)
+	if r.Method == "GET" {
+		http.ServeFile(w, r, "./module/templates/query.html")
 		return
+	} else if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "解析表格失败", http.StatusBadRequest)
+			return
+		}
+		idStr := r.FormValue("id")
+		number, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "无效的学生ID", http.StatusBadRequest)
+			return
+		}
+		stu, err := queryRow(number)
+		if err != nil {
+			log.Printf("查询失败，err：%v\n", err)
+			http.Error(w, "查询失败", http.StatusInternalServerError)
+			return
+		}
+		// 在模板中使用查询结果
+		tmpl, err := template.ParseFiles("./module/templates/querySuccess.html")
+		if err != nil {
+			log.Printf("模板解析错误：%v\n", err)
+			http.Error(w, fmt.Sprintf("模板解析错误: %v", err), http.StatusInternalServerError)
+			return
+		}
+		data := struct {
+			Number int
+			Name   string
+			Score  int
+		}{
+			Number: stu.Number,
+			Name:   stu.Name,
+			Score:  stu.Score,
+		}
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "模板渲染错误", http.StatusInternalServerError)
+			return
+		}
 	}
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "解析表格失败", http.StatusBadRequest)
-		return
-	}
-	idStr := r.FormValue("id")
-	number, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "无效的学生ID", http.StatusBadRequest)
-		return
-	}
-	stu, err := queryRow(number)
-	if err != nil {
-		log.Printf("查询失败，err：%v\n", err)
-		http.Error(w, "查询失败", http.StatusInternalServerError)
-		return
-	}
-	// 在模板中使用查询结果
-	tmpl, err := template.ParseFiles("./module/templates/querySuccess.html")
-	if err != nil {
-		log.Printf("模板解析错误：%v\n", err)
-		http.Error(w, fmt.Sprintf("模板解析错误: %v", err), http.StatusInternalServerError)
-		return
-	}
-	data := struct {
-		Number int
-		Name   string
-		Score  int
-	}{
-		Number: stu.Number,
-		Name:   stu.Name,
-		Score:  stu.Score,
-	}
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "模板渲染错误", http.StatusInternalServerError)
-		return
-	}
-	//else {
-	//	http.ServeFile(w, r, "./module/templates/query.html")
-	//}
 }
 
 func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {

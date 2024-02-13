@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/redis/go-redis/extra/redisotel/v9"
+	"github.com/redis/go-redis/v9"
 	"log"
 	"time"
 )
@@ -31,6 +32,15 @@ func init() {
 		Password: "",
 		DB:       0,
 	})
+	// 启用跟踪仪器。
+	if err := redisotel.InstrumentTracing(rdb); err != nil {
+		log.Fatalf("无法为Redis启用跟踪: %v", err)
+	}
+	// 启用指标仪器。
+	if err := redisotel.InstrumentMetrics(rdb); err != nil {
+		log.Fatalf("无法为Redis启用指标: %v", err)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if _, err := rdb.Ping(ctx).Result(); err != nil {
@@ -43,20 +53,6 @@ func init() {
 		log.Fatalf("无法连接到MySQL数据库: %v", err)
 	}
 }
-
-//type StudentID struct {
-//	ID  int
-//	pwd string
-//}
-
-//func ping(rdb *redis.Client) error {
-//	pong, err := rdb.Ping().Result()
-//	if err != nil {
-//		return err
-//	}
-//	fmt.Println(pong, err)
-//	return nil
-//}
 
 func register(number string, password string) (err error) {
 	currentTime := time.Now()
