@@ -63,7 +63,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./module/templates"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	http.HandleFunc("/", module.LoginHandler)
+	http.HandleFunc("/login", module.LoginHandler)
 	http.HandleFunc("/home", module.HomeHandler)
 	http.HandleFunc("/query", module.QueryRowHandler)
 	http.HandleFunc("/queryAll", module.QueryAllRowHandler)
@@ -72,6 +72,11 @@ func main() {
 	http.HandleFunc("/delete", module.DeleteRowHandler)
 	http.HandleFunc("/register", module.RegisterStudentHandler)
 	http.HandleFunc("/studentPage", module.StudentPageHandler)
+	http.HandleFunc("/studentSelect", func(w http.ResponseWriter, r *http.Request) {
+		module.StudentSelectHandler(w, r, db) // 将db传递给StudentSelectHandler
+	})
+
+	//http.HandleFunc("/select-course", selectCourseHandler)
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

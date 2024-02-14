@@ -9,6 +9,62 @@ import (
 	"strconv"
 )
 
+func StudentSelectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	if r.Method == http.MethodGet {
+		renderTemplate(w, nil)
+	} else if r.Method == http.MethodPost {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Parse form error", http.StatusBadRequest)
+			return
+		}
+		Number := r.FormValue("username")
+		studentNumber, err := strconv.Atoi(Number)
+		if err != nil {
+			fmt.Printf("转换失败，err：%v", err)
+		}
+		courseOption := r.FormValue("student-options")
+		_, err = db.Exec("UPDATE sms SET course = ? WHERE number = ?", courseOption, studentNumber)
+		if err != nil {
+			http.Error(w, "课程添加失败", http.StatusInternalServerError)
+			return
+		}
+
+		var successMessage string
+		switch courseOption {
+		case "数学课":
+			successMessage = "你已成功选取数学课程"
+		case "语文课":
+			successMessage = "你已成功选取语文课程"
+		case "英语课":
+			successMessage = "你已成功选取英语课程"
+		case "政治课":
+			successMessage = "你已成功选取政治课程"
+		case "地理课":
+			successMessage = "你已成功选取地理课程"
+		case "化学课":
+			successMessage = "你已成功选取化学课程"
+		}
+
+		renderTemplate(w, map[string]string{
+			"SuccessMessage": successMessage,
+		})
+	} else {
+		http.Error(w, "err", http.StatusMethodNotAllowed)
+	}
+}
+
+func renderTemplate(w http.ResponseWriter, data interface{}) {
+	tmpl, err := template.ParseFiles("./module/templates/studentSelect.html")
+	if err != nil {
+		http.Error(w, "Error loading page", http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		return
+	}
+}
+
 func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		cookie, err := r.Cookie("student_id")

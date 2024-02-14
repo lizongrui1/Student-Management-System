@@ -117,7 +117,7 @@ func insertRow(number int, name string, score int) (err error) {
 		fmt.Printf("获取插入ID失败, err:%v\n", err)
 		return
 	}
-	fmt.Printf("%s 加入成功, 新加入的学生序号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), insertedId)
+	log.Printf("%s 加入成功, 新加入的学生序号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), insertedId)
 	return
 }
 
