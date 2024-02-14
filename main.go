@@ -73,10 +73,8 @@ func main() {
 	http.HandleFunc("/register", module.RegisterStudentHandler)
 	http.HandleFunc("/studentPage", module.StudentPageHandler)
 	http.HandleFunc("/studentSelect", func(w http.ResponseWriter, r *http.Request) {
-		module.StudentSelectHandler(w, r, db) // 将db传递给StudentSelectHandler
+		module.StudentSelectHandler(w, r, db, rdb)
 	})
-
-	//http.HandleFunc("/select-course", selectCourseHandler)
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

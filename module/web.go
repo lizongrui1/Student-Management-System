@@ -3,25 +3,37 @@ package module
 import (
 	"database/sql"
 	"fmt"
+	"github.com/redis/go-redis/v9"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
-func StudentSelectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func StudentSelectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *redis.Client) {
 	if r.Method == http.MethodGet {
 		renderTemplate(w, nil)
 	} else if r.Method == http.MethodPost {
 		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Parse form error", http.StatusBadRequest)
+			http.Error(w, "解析表单错误", http.StatusBadRequest)
 			return
 		}
-		Number := r.FormValue("username")
-		studentNumber, err := strconv.Atoi(Number)
+
+		studentNumberStr, err := rdb.Get(ctx, "student_id").Result()
+		if err != nil {
+			log.Printf("获取学号失败，err：%v", err)
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
+		}
+
+		studentNumber, err := strconv.Atoi(studentNumberStr)
 		if err != nil {
 			fmt.Printf("转换失败，err：%v", err)
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
 		}
+
 		courseOption := r.FormValue("student-options")
 		_, err = db.Exec("UPDATE sms SET course = ? WHERE number = ?", courseOption, studentNumber)
 		if err != nil {
@@ -155,6 +167,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if isValid {
+			sessionKey := fmt.Sprintf("%s_id", userType)
+			err := rdb.Set(ctx, sessionKey, userName, 24*time.Hour).Err()
+			if err != nil {
+				log.Printf("无法将用户信息存储到Redis：%v", err)
+				http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+				return
+			}
+
 			switch action {
 			case "学生登录":
 				http.SetCookie(w, &http.Cookie{
