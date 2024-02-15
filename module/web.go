@@ -133,7 +133,6 @@ func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "注册失败，请重新输入正确的学号或密码", http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprint(w, "注册成功，请返回登录页面。")
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 	} else {
 		http.ServeFile(w, r, "./module/templates/studentRegister.html")

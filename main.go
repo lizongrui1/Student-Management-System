@@ -63,7 +63,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./module/templates"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	http.HandleFunc("/login", module.LoginHandler)
+	http.HandleFunc("/", module.LoginHandler)
 	http.HandleFunc("/home", module.HomeHandler)
 	http.HandleFunc("/query", module.QueryRowHandler)
 	http.HandleFunc("/queryAll", module.QueryAllRowHandler)
