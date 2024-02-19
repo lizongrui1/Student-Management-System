@@ -13,13 +13,20 @@
             padding: 8px;
             text-align: left;
         }
-        .button-link {
+        .button-link, button {
             display: inline-block;
             text-decoration: none;
             color: initial;
-        }
-        button {
             cursor: pointer;
+        }
+        /* 添加信息框的样式 */
+        .info-box {
+            padding: 10px;
+            margin: 20px 0;
+            border: 1px solid #d3d3d3;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            color: #333;
         }
     </style>
 </head>
@@ -40,9 +47,33 @@
     </tr>
 </table>
 
+<!-- 信息显示框 -->
+<div id="infoBox" class="info-box">
+    这里是一些重要信息或者通知，可以根据需要动态更新。
+</div>
+
+<!-- 添加一个示例按钮来更新信息显示框 -->
+<button onclick="updateInfoBox('用户通过按钮更新了这个信息')">点击这里更新信息</button>
+
 <a href="/studentSelect" class="button-link">
     <button type="button">继续选课</button>
 </a>
+
+<script>
+    // 假设这是从服务器获取的新信息
+    var newInfo = "这是一个示例通知，表示信息已经更新！";
+
+    // 设置一个简单的延时来模拟异步操作，如从服务器获取数据
+    setTimeout(function() {
+        // 使用 getElementById() 找到信息框，并更新其内容
+        document.getElementById('infoBox').innerHTML = newInfo;
+    }, 3000); // 3000 毫秒后更新内容，模拟异步数据加载
+
+    // 根据用户的操作（如点击按钮）来更新这个信息框
+    function updateInfoBox(userInput) {
+        document.getElementById('infoBox').innerHTML = userInput;
+    }
+</script>
 
 </body>
 </html>

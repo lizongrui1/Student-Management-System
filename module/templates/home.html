@@ -21,6 +21,14 @@
     <input type="submit" value="提交">
 </form>
 
+<!-- 添加发送信息的窗口 -->
+<div>
+    <h3>发送信息</h3>
+    <textarea id="messageBox" rows="4" cols="50" placeholder="在这里输入信息..."></textarea>
+    <br>
+    <button onclick="sendMessage()">发送信息</button>
+</div>
+
 <script>
     document.getElementById('student-form').addEventListener('submit', function(event) {
         event.preventDefault(); // 阻止表单默认提交行为
@@ -47,6 +55,14 @@
                 break;
         }
     });
+
+    // 定义 sendMessage 函数来处理信息发送
+    function sendMessage() {
+        var message = document.getElementById('messageBox').value;
+        alert("发送的信息: " + message);
+        // 在这里，你可以添加代码将信息发送到服务器或进行其他处理
+        // 暂时我们只是显示一个警告框来模拟发送过程
+    }
 </script>
 </body>
 </html>
