@@ -11,6 +11,21 @@ import (
 	"time"
 )
 
+func MessageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "只允许post", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "表单解析错误", http.StatusInternalServerError)
+		return
+	}
+	message := r.FormValue("message")
+	fmt.Printf("收到消息: %s\n", message)
+
+	fmt.Fprintf(w, "收到消息: %s", message)
+}
+
 func StudentSelectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *redis.Client) {
 	if r.Method == http.MethodGet {
 		renderTemplate(w, nil)

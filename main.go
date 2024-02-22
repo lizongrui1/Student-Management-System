@@ -11,6 +11,14 @@ import (
 	"os"
 )
 
+var tcpServer *module.Server
+
+func init() {
+	// 在程序启动时初始化TCP服务器
+	tcpServer = module.NewServer("127.0.0.1", 8888)
+	go tcpServer.Start()
+}
+
 func main() {
 	//mysql
 	db, err := module.InitDB()
@@ -75,7 +83,9 @@ func main() {
 	http.HandleFunc("/studentSelect", func(w http.ResponseWriter, r *http.Request) {
 		module.StudentSelectHandler(w, r, db, rdb)
 	})
+	http.HandleFunc("/sendMessage", module.MessageHandler)
 
+	module.NewServer("127.0.0.1", 8888)
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)
 	if err != nil {

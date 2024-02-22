@@ -1,3 +1,4 @@
+# Windows的配置
 database:
   username: "root"
   password: "12345678"
@@ -5,3 +6,12 @@ database:
   port: "3306"
   name: "studb"
   charset: "utf8"
+
+# macos的配置
+# database:
+#  username: "root"
+#  password: "12345678"
+#  host: "127.0.0.1"
+#  port: "3306"
+#  name: "studb"
+#  charset: "utf8"
