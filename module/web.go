@@ -8,23 +8,61 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
-func MessageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "只允许post", http.StatusMethodNotAllowed)
-		return
-	}
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "表单解析错误", http.StatusInternalServerError)
-		return
-	}
-	message := r.FormValue("message")
-	fmt.Printf("收到消息: %s\n", message)
+// 全局变量来存储最新的消息
+var lastMessage string
+var lastMessageMutex sync.Mutex // 用于同步访问lastMessage
+var messageChannel = make(chan string)
 
-	fmt.Fprintf(w, "收到消息: %s", message)
+func init() {
+	go func() {
+		for msg := range messageChannel {
+			lastMessageMutex.Lock()
+			lastMessage = msg
+			lastMessageMutex.Unlock()
+		}
+	}()
 }
+
+func MessageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("表单解析错误: %v\n", err)
+			http.Error(w, "表单解析错误", http.StatusBadRequest)
+			return
+		}
+		message := r.FormValue("message")
+		fmt.Printf("收到消息: %s\n", message)
+		messageChannel <- message
+		fmt.Fprintf(w, "消息已发送")
+	} else {
+		http.ServeFile(w, r, "module/templates/sendMessage.html")
+	}
+}
+
+//func ShowMessageHandler(w http.ResponseWriter, r *http.Request) {
+//	lastMessageMutex.Lock()
+//	msg := lastMessage
+//	lastMessageMutex.Unlock()
+//
+//	tmpl, err := template.ParseFiles("module/templates/studentPage.html")
+//	if err != nil {
+//		http.Error(w, "模板解析错误: "+err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//	data := struct {
+//		Message string
+//	}{
+//		Message: msg,
+//	}
+//	if err := tmpl.Execute(w, data); err != nil {
+//		http.Error(w, "模板执行错误: "+err.Error(), http.StatusInternalServerError)
+//	}
+//}
 
 func StudentSelectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *redis.Client) {
 	if r.Method == http.MethodGet {
@@ -92,45 +130,96 @@ func renderTemplate(w http.ResponseWriter, data interface{}) {
 	}
 }
 
+//func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
+//	if r.Method == http.MethodGet {
+//		cookie, err := r.Cookie("student_id")
+//		if err != nil {
+//			// 处理cookie不存在的情况
+//			http.Error(w, "未授权访问", http.StatusUnauthorized)
+//			return
+//		}
+//		number, err := strconv.Atoi(cookie.Value)
+//		if err != nil {
+//			http.Error(w, "无效的学生ID", http.StatusBadRequest)
+//			return
+//		}
+//		stu, err := queryRow(number)
+//		if err != nil {
+//			log.Printf("查询失败，err：%v\n", err)
+//			http.Error(w, "查询失败", http.StatusInternalServerError)
+//			return
+//		}
+//		tmpl, err := template.ParseFiles("./module/templates/studentPage.html")
+//		if err != nil {
+//			log.Printf("模板解析错误：%v\n", err)
+//			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+//			return
+//		}
+//		data := struct {
+//			Name   string
+//			Number int
+//			Score  int
+//		}{
+//			Name:   stu.Name,
+//			Number: stu.Number,
+//			Score:  stu.Score,
+//		}
+//		err = tmpl.Execute(w, data)
+//		if err != nil {
+//			log.Printf("模板渲染错误，err：%v\n", err)
+//			return
+//		}
+//	}
+//}
+
 func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		cookie, err := r.Cookie("student_id")
-		if err != nil {
-			// 处理cookie不存在的情况
-			http.Error(w, "未授权访问", http.StatusUnauthorized)
-			return
-		}
-		number, err := strconv.Atoi(cookie.Value)
-		if err != nil {
-			http.Error(w, "无效的学生ID", http.StatusBadRequest)
-			return
-		}
-		stu, err := queryRow(number)
-		if err != nil {
-			log.Printf("查询失败，err：%v\n", err)
-			http.Error(w, "查询失败", http.StatusInternalServerError)
-			return
-		}
-		tmpl, err := template.ParseFiles("./module/templates/studentPage.html")
-		if err != nil {
-			log.Printf("模板解析错误：%v\n", err)
-			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
-			return
-		}
-		data := struct {
-			Name   string
-			Number int
-			Score  int
-		}{
-			Name:   stu.Name,
-			Number: stu.Number,
-			Score:  stu.Score,
-		}
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			log.Printf("模板渲染错误，err：%v\n", err)
-			return
-		}
+	if r.Method != http.MethodGet {
+		http.Error(w, "只允许GET方法", http.StatusMethodNotAllowed)
+		return
+	}
+
+	cookie, err := r.Cookie("student_id")
+	if err != nil {
+		http.Error(w, "未授权访问", http.StatusUnauthorized)
+		return
+	}
+	number, err := strconv.Atoi(cookie.Value)
+	if err != nil {
+		http.Error(w, "无效的学生ID", http.StatusBadRequest)
+		return
+	}
+	stu, err := queryRow(number)
+	if err != nil {
+		log.Printf("查询失败，err：%v\n", err)
+		http.Error(w, "查询失败", http.StatusInternalServerError)
+		return
+	}
+
+	lastMessageMutex.Lock()
+	msg := lastMessage
+	lastMessageMutex.Unlock()
+
+	data := struct {
+		Name    string
+		Number  int
+		Score   int
+		Message string
+	}{
+		Name:    stu.Name,
+		Number:  stu.Number,
+		Score:   stu.Score,
+		Message: msg,
+	}
+	tmpl, err := template.ParseFiles("module/templates/studentPage.html")
+	if err != nil {
+		log.Printf("模板解析错误：%v\n", err)
+		http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, data); err != nil {
+		log.Printf("模板渲染错误，err：%v\n", err)
+		http.Error(w, "模板执行错误", http.StatusInternalServerError)
 	}
 }
 

@@ -15,22 +15,13 @@
         <option value="3">修改学生信息</option>
         <option value="4">新增学生信息</option>
         <option value="5">删除学生信息</option>
+        <option value="6">发送通知信息</option>
         <option value="0">退出系统</option>
     </select>
     <br><br>
     <input type="submit" value="提交">
 </form>
 
-<!-- 添加发送信息的窗口 -->
-<div>
-    <h3>发送信息</h3>
-    <!-- 添加表单来提交信息 -->
-    <form action="/sendMessage" method="post">
-        <textarea name="message" id="messageBox" rows="4" cols="50" placeholder="在这里输入信息..."></textarea>
-        <br>
-        <input type="submit" value="发送信息"/>
-    </form>
-</div>
 
 <script>
     document.getElementById('student-form').addEventListener('submit', function(event) {
@@ -52,6 +43,9 @@
             case '5':
                 window.location.href = "/static/delete.html";
                 break;
+            case '6':
+                window.location.href = "/sendMessage";
+                break;
             default:
                 alert('退出系统，请关闭网页');
                 window.location.href = "/static/login.html";
@@ -60,12 +54,12 @@
     });
 
     // 定义 sendMessage 函数来处理信息发送
-    function sendMessage() {
-        var message = document.getElementById('messageBox').value;
-        alert("发送的信息: " + message);
-        // 在这里，你可以添加代码将信息发送到服务器或进行其他处理
-        // 暂时我们只是显示一个警告框来模拟发送过程
-    }
+    // function sendMessage() {
+    //     var message = document.getElementById('messageBox').value;
+    //     alert("发送的信息: " + message);
+    //     // 在这里，你可以添加代码将信息发送到服务器或进行其他处理
+    //     // 暂时我们只是显示一个警告框来模拟发送过程
+    // }
 </script>
 </body>
 </html>

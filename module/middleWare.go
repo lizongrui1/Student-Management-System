@@ -63,6 +63,20 @@ func InitRDB() error {
 	if err != nil {
 		log.Fatalf("无法连接到MySQL数据库: %v", err)
 	}
+
+	go func() {
+		for {
+			select {
+			case msg := <-messageChannel:
+				// 存储消息到Redis
+				err := rdb.Set(context.Background(), "messageKey", msg, 0).Err()
+				if err != nil {
+					log.Printf("存储消息失败: %v", err)
+				}
+			}
+		}
+	}()
+
 	return nil
 }
 

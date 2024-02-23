@@ -20,9 +20,9 @@ var ctx = context.Background()
 type myUsualType interface{}
 
 type Student struct {
-	Number int    `json:"number"`
-	Name   string `json:"name"`
-	Score  int    `json:"score"`
+	Number int `json:"number"`
+	Name   string
+	Score  int
 }
 
 func register(number string, password string) (err error) {
