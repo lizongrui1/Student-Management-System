@@ -20,9 +20,76 @@ var ctx = context.Background()
 type myUsualType interface{}
 
 type Student struct {
-	Number int `json:"number"`
-	Name   string
-	Score  int
+	Number int    `json:"number"`
+	Name   string `json:"name"`
+	Score  int    `json:"score"`
+}
+
+func obtainStudent(ctx context.Context, db *sql.DB, rdb *redis.Client) (err error) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	rows, err := db.QueryContext(timeoutCtx, "SELECT number, name FROM sms")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var number string
+		var name string
+		if err := rows.Scan(&number, &name); err != nil {
+			log.Fatal(err)
+			return err
+		}
+
+		if err := rdb.Set(timeoutCtx, number, name, 0).Err(); err != nil {
+			log.Fatal(err)
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+
+func studentsScore(ctx context.Context, db *sql.DB, rdb *redis.Client) (err error) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	rows, err := db.QueryContext(timeoutCtx, "SELECT number, name, score FROM sms")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var number int
+		var name string
+		var score float64
+		if err := rows.Scan(&number, &name, &score); err != nil {
+			log.Fatal(err)
+			return err
+		}
+		member := fmt.Sprintf("%d:%s", number, name)
+		if err := rdb.ZAdd(timeoutCtx, "students", redis.Z{
+			Score:  score,
+			Member: member,
+		}).Err(); err != nil {
+			log.Fatal(err)
+			return err
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
 }
 
 func register(number string, password string) (err error) {
