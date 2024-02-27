@@ -3,18 +3,32 @@ package module
 import (
 	"context"
 	"database/sql"
+<<<<<<< HEAD
+<<<<<<< HEAD
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"log"
 	"os"
+=======
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/redis/go-redis/v9"
+	"log"
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/redis/go-redis/v9"
+	"log"
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 	"time"
 )
 
 //var tpl *template.Template
 
 func InitDB() (*sql.DB, error) {
+<<<<<<< HEAD
+<<<<<<< HEAD
 	Initconfig()
 	username := viper.GetString("database.username")
 	password := viper.GetString("database.password")
@@ -35,6 +49,18 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
+=======
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+	//tpl = template.Must(template.ParseGlob("./module/templates/*.html"))
+	db, err := sql.Open("mysql", "root:12345678@tcp(127.0.0.1:3306)/studb?charset=utf8")
+	if err != nil {
+		return nil, err
+	}
+<<<<<<< HEAD
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 	if err := db.Ping(); err != nil {
 		err := db.Close()
 		if err != nil {
@@ -63,6 +89,8 @@ func InitRDB() error {
 	if err != nil {
 		log.Fatalf("无法连接到MySQL数据库: %v", err)
 	}
+<<<<<<< HEAD
+<<<<<<< HEAD
 
 	go func() {
 		for {
@@ -93,3 +121,11 @@ func Initconfig() {
 		log.Fatalf("读取配置文件失败，err：%s", err.Error())
 	}
 }
+=======
+	return nil
+}
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+	return nil
+}
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f

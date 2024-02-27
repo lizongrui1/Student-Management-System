@@ -63,7 +63,15 @@ func main() {
 	fs := http.FileServer(http.Dir("./module/templates"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 	http.HandleFunc("/", module.LoginHandler)
+=======
+	http.HandleFunc("/login", module.LoginHandler)
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+	http.HandleFunc("/login", module.LoginHandler)
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 	http.HandleFunc("/home", module.HomeHandler)
 	http.HandleFunc("/query", module.QueryRowHandler)
 	http.HandleFunc("/queryAll", module.QueryAllRowHandler)
@@ -75,8 +83,13 @@ func main() {
 	http.HandleFunc("/studentSelect", func(w http.ResponseWriter, r *http.Request) {
 		module.StudentSelectHandler(w, r, db, rdb)
 	})
+<<<<<<< HEAD
+<<<<<<< HEAD
 	http.HandleFunc("/sendMessage", module.MessageHandler)
-	//http.HandleFunc("/show-message", module.ShowMessageHandler)
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

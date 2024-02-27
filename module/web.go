@@ -8,11 +8,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+<<<<<<< HEAD
+<<<<<<< HEAD
 	"sync"
 	"time"
 )
 
-// 全局变量来存储最新的消息
 var lastMessage string
 var lastMessageMutex sync.Mutex // 用于同步访问lastMessage
 var messageChannel = make(chan string)
@@ -64,6 +65,16 @@ func MessageHandler(w http.ResponseWriter, r *http.Request) {
 //	}
 //}
 
+=======
+	"time"
+)
+
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+	"time"
+)
+
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 func StudentSelectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *redis.Client) {
 	if r.Method == http.MethodGet {
 		renderTemplate(w, nil)
@@ -130,6 +141,8 @@ func renderTemplate(w http.ResponseWriter, data interface{}) {
 	}
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 //func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 //	if r.Method == http.MethodGet {
 //		cookie, err := r.Cookie("student_id")
@@ -220,6 +233,52 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 	if err := tmpl.Execute(w, data); err != nil {
 		log.Printf("模板渲染错误，err：%v\n", err)
 		http.Error(w, "模板执行错误", http.StatusInternalServerError)
+=======
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		cookie, err := r.Cookie("student_id")
+		if err != nil {
+			// 处理cookie不存在的情况
+			http.Error(w, "未授权访问", http.StatusUnauthorized)
+			return
+		}
+		number, err := strconv.Atoi(cookie.Value)
+		if err != nil {
+			http.Error(w, "无效的学生ID", http.StatusBadRequest)
+			return
+		}
+		stu, err := queryRow(number)
+		if err != nil {
+			log.Printf("查询失败，err：%v\n", err)
+			http.Error(w, "查询失败", http.StatusInternalServerError)
+			return
+		}
+		tmpl, err := template.ParseFiles("./module/templates/studentPage.html")
+		if err != nil {
+			log.Printf("模板解析错误：%v\n", err)
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
+		}
+		data := struct {
+			Name   string
+			Number int
+			Score  int
+		}{
+			Name:   stu.Name,
+			Number: stu.Number,
+			Score:  stu.Score,
+		}
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			log.Printf("模板渲染错误，err：%v\n", err)
+			return
+		}
+<<<<<<< HEAD
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 	}
 }
 
@@ -237,6 +296,14 @@ func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "注册失败，请重新输入正确的学号或密码", http.StatusInternalServerError)
 			return
 		}
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+		fmt.Fprint(w, "注册成功，请返回登录页面。")
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+		fmt.Fprint(w, "注册成功，请返回登录页面。")
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 	} else {
 		http.ServeFile(w, r, "./module/templates/studentRegister.html")

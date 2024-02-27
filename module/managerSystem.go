@@ -6,7 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+<<<<<<< HEAD
+<<<<<<< HEAD
 	"github.com/jinzhu/now"
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 	"github.com/redis/go-redis/v9"
 	"log"
 	"time"
@@ -26,7 +32,15 @@ type Student struct {
 }
 
 func register(number string, password string) (err error) {
+<<<<<<< HEAD
+<<<<<<< HEAD
 	time.Now()
+=======
+	currentTime := time.Now()
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+	currentTime := time.Now()
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 	ret, err := db.Exec("INSERT INTO stu (student_id, password) VALUES (?, ?)", number, password)
 	if err != nil {
 		log.Printf("学生账号添加失败: %v\n", err)
@@ -36,7 +50,15 @@ func register(number string, password string) (err error) {
 	if err != nil {
 		log.Printf("新注册学生ID失败: %v\n", err)
 	}
+<<<<<<< HEAD
+<<<<<<< HEAD
 	log.Printf("%s注册成功, 新注册的学生学号为：%d\n", now.BeginningOfMinute(), newID)
+=======
+	log.Printf("%s注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), newID)
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
+=======
+	log.Printf("%s注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), newID)
+>>>>>>> 7fee29fce5c6d0e2c2bb376910a3d3b621e5ec1f
 	return
 }
 
