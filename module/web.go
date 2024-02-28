@@ -359,7 +359,9 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 
 func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		students, err := queryMultiRow()
+		ctx := r.Context()
+		//students, err := queryMultiRow()
+		students, err := studentsScore(ctx, db, rdb)
 		if err != nil {
 			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
 			return

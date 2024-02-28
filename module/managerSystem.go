@@ -9,6 +9,8 @@ import (
 	"github.com/jinzhu/now"
 	"github.com/redis/go-redis/v9"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -55,15 +57,14 @@ func obtainStudent(ctx context.Context, db *sql.DB, rdb *redis.Client) (err erro
 	return nil
 }
 
-
-func studentsScore(ctx context.Context, db *sql.DB, rdb *redis.Client) (err error) {
+func studentsScore(ctx context.Context, db *sql.DB, rdb *redis.Client) ([]Student, error) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	rows, err := db.QueryContext(timeoutCtx, "SELECT number, name, score FROM sms")
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -73,7 +74,7 @@ func studentsScore(ctx context.Context, db *sql.DB, rdb *redis.Client) (err erro
 		var score float64
 		if err := rows.Scan(&number, &name, &score); err != nil {
 			log.Fatal(err)
-			return err
+			return nil, err
 		}
 		member := fmt.Sprintf("%d:%s", number, name)
 		if err := rdb.ZAdd(timeoutCtx, "students", redis.Z{
@@ -81,15 +82,38 @@ func studentsScore(ctx context.Context, db *sql.DB, rdb *redis.Client) (err erro
 			Member: member,
 		}).Err(); err != nil {
 			log.Fatal(err)
-			return err
+			return nil, err
 		}
 	}
 
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
-		return err
+		return nil, err
 	}
-	return nil
+	results, err := rdb.ZRangeWithScores(ctx, "students", 0, -1).Result()
+	if err != nil {
+		log.Printf("获取学生分数失败, err:%v\n", err)
+		return nil, err
+	}
+	var students []Student
+	for _, result := range results {
+		split := strings.Split(result.Member.(string), ":")
+		if len(split) < 2 {
+			log.Printf("成员格式错误: %v\n", result.Member)
+			continue
+		}
+		number, err := strconv.Atoi(split[0])
+		if err != nil {
+			log.Printf("转换编号失败, err:%v\n", err)
+			continue
+		}
+		students = append(students, Student{
+			Number: number,
+			Name:   split[1],
+			Score:  int(result.Score),
+		})
+	}
+	return students, err
 }
 
 func register(number string, password string) (err error) {
