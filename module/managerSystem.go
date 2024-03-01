@@ -27,34 +27,30 @@ type Student struct {
 	Score  int    `json:"score"`
 }
 
-func obtainStudent(ctx context.Context, db *sql.DB, rdb *redis.Client) (err error) {
+func obtainStudent(ctx context.Context, db *sql.DB) ([]string, error) {
+	var names []string
 	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	rows, err := db.QueryContext(timeoutCtx, "SELECT number, name FROM sms")
+	rows, err := db.QueryContext(timeoutCtx, "SELECT name FROM sms")
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var number string
 		var name string
-		if err := rows.Scan(&number, &name); err != nil {
+		if err := rows.Scan(&name); err != nil {
 			log.Fatal(err)
-			return err
+			return nil, err
 		}
-
-		if err := rdb.Set(timeoutCtx, number, name, 0).Err(); err != nil {
-			log.Fatal(err)
-			return err
-		}
+		names = append(names, name)
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
-		return err
+		return nil, err
 	}
-	return nil
+	return names, nil
 }
 
 func studentsScore(ctx context.Context, db *sql.DB, rdb *redis.Client) ([]Student, error) {

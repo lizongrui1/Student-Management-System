@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>学生列表</title>
+</head>
+<body>
+<h1>学生列表</h1>
+<select id="studentsSelect">
+    <option value="">Loading...</option>
+</select>
+<form id="scoreForm">
+    <label for="scoreInput">平时成绩为：</label>
+    <input type="text" id="scoreInput" name="score">
+    <button type="submit">提交</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/integral')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('studentsSelect');
+                select.innerHTML = '';
+                data.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching student names:', error);
+                document.getElementById('studentsSelect').innerHTML = '<option value="">请求失败</option>';
+            });
+    });
+
+    document.getElementById('scoreForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var score = document.getElementById('scoreInput').value;
+        // 这里可以添加代码处理分数，例如验证或发送到服务器
+        console.log('提交的成绩:', score);
+        // 可以使用 fetch() 发送数据到服务器
+    });
+</script>
+</body>
+</html>

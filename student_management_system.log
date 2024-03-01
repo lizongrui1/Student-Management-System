@@ -100,3 +100,108 @@ net/http.(*conn).serve(0xc0000965a0, {0xc6e9e8, 0xc000094720})
 	C:/Program Files/Go/src/net/http/server.go:2039 +0x5e8
 created by net/http.(*Server).Serve in goroutine 1
 	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
+2024/03/01 15:07:03 http: panic serving 127.0.0.1:60767: runtime error: invalid memory address or nil pointer dereference
+goroutine 8 [running]:
+net/http.(*conn).serve.func1()
+	/usr/local/go/src/net/http/server.go:1898 +0xb0
+panic({0x1046b5760?, 0x104b266b0?})
+	/usr/local/go/src/runtime/panic.go:770 +0x124
+database/sql.(*DB).conn(0x10?, {0x1047661f0?, 0x104ba4a40?}, 0x2c?)
+	/usr/local/go/src/database/sql/sql.go:1310 +0x28
+database/sql.(*DB).query(0x0, {0x1047661f0, 0x104ba4a40}, {0x10458c3c0, 0x2d}, {0x14000173840, 0x1, 0x1}, 0x10?)
+	/usr/local/go/src/database/sql/sql.go:1749 +0x40
+database/sql.(*DB).QueryContext.func1(0x30?)
+	/usr/local/go/src/database/sql/sql.go:1732 +0x54
+database/sql.(*DB).retry(0x14000173718?, 0x14000173710)
+	/usr/local/go/src/database/sql/sql.go:1566 +0x4c
+database/sql.(*DB).QueryContext(0x10?, {0x1047661f0?, 0x104ba4a40?}, {0x10458c3c0?, 0x0?}, {0x14000173840?, 0x140001737d8?, 0x10454bc58?})
+	/usr/local/go/src/database/sql/sql.go:1731 +0x94
+database/sql.(*DB).QueryRowContext(...)
+	/usr/local/go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0x140003c2059?, {0x10458c3c0?, 0x0?}, {0x14000173840?, 0x1047034c0?, 0x140003d2188?})
+	/usr/local/go/src/database/sql/sql.go:1846 +0x48
+StudentManagementSystem/module.validate({0x140003c2059, 0x4}, {0x140003c2067, 0x3}, {0x104571370, 0x7})
+	/Users/lizongrui/Downloads/stu/module/web.go:537 +0x17c
+StudentManagementSystem/module.LoginHandler({0x1047658e0, 0x140003cc000}, 0x14000394120)
+	/Users/lizongrui/Downloads/stu/module/web.go:266 +0x178
+net/http.HandlerFunc.ServeHTTP(0x104b3e7f0?, {0x1047658e0?, 0x140003cc000?}, 0x14000173b00?)
+	/usr/local/go/src/net/http/server.go:2166 +0x38
+net/http.(*ServeMux).ServeHTTP(0x10?, {0x1047658e0, 0x140003cc000}, 0x14000394120)
+	/usr/local/go/src/net/http/server.go:2683 +0x1a4
+net/http.serverHandler.ServeHTTP({0x104764328?}, {0x1047658e0?, 0x140003cc000?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3137 +0xbc
+net/http.(*conn).serve(0x140000981b0, {0x104766308, 0x14000090780})
+	/usr/local/go/src/net/http/server.go:2039 +0x508
+created by net/http.(*Server).Serve in goroutine 1
+	/usr/local/go/src/net/http/server.go:3285 +0x3f0
+2024/03/01 15:07:03 http: panic serving 127.0.0.1:60768: runtime error: invalid memory address or nil pointer dereference
+goroutine 9 [running]:
+net/http.(*conn).serve.func1()
+	/usr/local/go/src/net/http/server.go:1898 +0xb0
+panic({0x1046b5760?, 0x104b266b0?})
+	/usr/local/go/src/runtime/panic.go:770 +0x124
+database/sql.(*DB).conn(0x10?, {0x1047661f0?, 0x104ba4a40?}, 0x2c?)
+	/usr/local/go/src/database/sql/sql.go:1310 +0x28
+database/sql.(*DB).query(0x0, {0x1047661f0, 0x104ba4a40}, {0x10458c3c0, 0x2d}, {0x14000173840, 0x1, 0x1}, 0x10?)
+	/usr/local/go/src/database/sql/sql.go:1749 +0x40
+database/sql.(*DB).QueryContext.func1(0x30?)
+	/usr/local/go/src/database/sql/sql.go:1732 +0x54
+database/sql.(*DB).retry(0x14000173718?, 0x14000173710)
+	/usr/local/go/src/database/sql/sql.go:1566 +0x4c
+database/sql.(*DB).QueryContext(0x10?, {0x1047661f0?, 0x104ba4a40?}, {0x10458c3c0?, 0x0?}, {0x14000173840?, 0x140001737d8?, 0x10454bc58?})
+	/usr/local/go/src/database/sql/sql.go:1731 +0x94
+database/sql.(*DB).QueryRowContext(...)
+	/usr/local/go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0x140003c20f9?, {0x10458c3c0?, 0x0?}, {0x14000173840?, 0x1047034c0?, 0x140003d2448?})
+	/usr/local/go/src/database/sql/sql.go:1846 +0x48
+StudentManagementSystem/module.validate({0x140003c20f9, 0x4}, {0x140003c2107, 0x3}, {0x104571370, 0x7})
+	/Users/lizongrui/Downloads/stu/module/web.go:537 +0x17c
+StudentManagementSystem/module.LoginHandler({0x1047658e0, 0x140003cc0e0}, 0x14000000900)
+	/Users/lizongrui/Downloads/stu/module/web.go:266 +0x178
+net/http.HandlerFunc.ServeHTTP(0x104b3e7f0?, {0x1047658e0?, 0x140003cc0e0?}, 0x14000387b00?)
+	/usr/local/go/src/net/http/server.go:2166 +0x38
+net/http.(*ServeMux).ServeHTTP(0x10?, {0x1047658e0, 0x140003cc0e0}, 0x14000000900)
+	/usr/local/go/src/net/http/server.go:2683 +0x1a4
+net/http.serverHandler.ServeHTTP({0x104764328?}, {0x1047658e0?, 0x140003cc0e0?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3137 +0xbc
+net/http.(*conn).serve(0x14000098240, {0x104766308, 0x14000090780})
+	/usr/local/go/src/net/http/server.go:2039 +0x508
+created by net/http.(*Server).Serve in goroutine 1
+	/usr/local/go/src/net/http/server.go:3285 +0x3f0
+2024/03/01 15:07:03 http: panic serving 127.0.0.1:60776: runtime error: invalid memory address or nil pointer dereference
+goroutine 40 [running]:
+net/http.(*conn).serve.func1()
+	/usr/local/go/src/net/http/server.go:1898 +0xb0
+panic({0x1046b5760?, 0x104b266b0?})
+	/usr/local/go/src/runtime/panic.go:770 +0x124
+database/sql.(*DB).conn(0x10?, {0x1047661f0?, 0x104ba4a40?}, 0x2c?)
+	/usr/local/go/src/database/sql/sql.go:1310 +0x28
+database/sql.(*DB).query(0x0, {0x1047661f0, 0x104ba4a40}, {0x10458c3c0, 0x2d}, {0x14000173840, 0x1, 0x1}, 0x10?)
+	/usr/local/go/src/database/sql/sql.go:1749 +0x40
+database/sql.(*DB).QueryContext.func1(0x30?)
+	/usr/local/go/src/database/sql/sql.go:1732 +0x54
+database/sql.(*DB).retry(0x14000173718?, 0x14000173710)
+	/usr/local/go/src/database/sql/sql.go:1566 +0x4c
+database/sql.(*DB).QueryContext(0x10?, {0x1047661f0?, 0x104ba4a40?}, {0x10458c3c0?, 0x0?}, {0x14000173840?, 0x140001737d8?, 0x10454bc58?})
+	/usr/local/go/src/database/sql/sql.go:1731 +0x94
+database/sql.(*DB).QueryRowContext(...)
+	/usr/local/go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0x140003c2199?, {0x10458c3c0?, 0x0?}, {0x14000173840?, 0x1047034c0?, 0x140003d2708?})
+	/usr/local/go/src/database/sql/sql.go:1846 +0x48
+StudentManagementSystem/module.validate({0x140003c2199, 0x4}, {0x140003c21a7, 0x3}, {0x104571370, 0x7})
+	/Users/lizongrui/Downloads/stu/module/web.go:537 +0x17c
+StudentManagementSystem/module.LoginHandler({0x1047658e0, 0x140003cc1c0}, 0x14000394240)
+	/Users/lizongrui/Downloads/stu/module/web.go:266 +0x178
+net/http.HandlerFunc.ServeHTTP(0x104b3e7f0?, {0x1047658e0?, 0x140003cc1c0?}, 0x14000387b00?)
+	/usr/local/go/src/net/http/server.go:2166 +0x38
+net/http.(*ServeMux).ServeHTTP(0x10?, {0x1047658e0, 0x140003cc1c0}, 0x14000394240)
+	/usr/local/go/src/net/http/server.go:2683 +0x1a4
+net/http.serverHandler.ServeHTTP({0x104764328?}, {0x1047658e0?, 0x140003cc1c0?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3137 +0xbc
+net/http.(*conn).serve(0x140003a2360, {0x104766308, 0x14000090780})
+	/usr/local/go/src/net/http/server.go:2039 +0x508
+created by net/http.(*Server).Serve in goroutine 1
+	/usr/local/go/src/net/http/server.go:3285 +0x3f0
+2024/03/01 15:07:23 sql: Scan error on column index 0, name "number": converting NULL to int is unsupported
+2024/03/01 15:08:20 sql: Scan error on column index 0, name "number": converting NULL to int is unsupported
+2024/03/01 15:11:33 sql: Scan error on column index 1, name "name": converting NULL to string is unsupported

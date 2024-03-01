@@ -1,7 +1,9 @@
 package module
 
 import (
+	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"html/template"
@@ -25,6 +27,20 @@ func init() {
 			lastMessageMutex.Unlock()
 		}
 	}()
+}
+
+func ShowStudentHandler(w http.ResponseWriter, r *http.Request) {
+	names, err := obtainStudent(context.Background(), db)
+	if err != nil {
+		http.Error(w, "Failed to obtain student names", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(names)
+	if err != nil {
+		http.Error(w, "Failed to encode student names to JSON", http.StatusInternalServerError)
+	}
 }
 
 func MessageHandler(w http.ResponseWriter, r *http.Request) {
