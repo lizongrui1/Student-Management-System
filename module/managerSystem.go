@@ -27,6 +27,53 @@ type Student struct {
 	Score  int    `json:"score"`
 }
 
+// 投票功能
+func getKey(tid int64) string {
+	return fmt.Sprintf("teacher:like:%d", tid)
+}
+
+// tid 需要点赞教师的ID   id 学生ID
+func GiveLike(ctx context.Context, tid int64, id int64) (bool, error) {
+	keys := getKey(tid)
+	res, err := rdb.GetBit(ctx, keys, (id - 1)).Result()
+	if err != nil {
+		return false, err
+	}
+
+	if res == 1 {
+		return true, nil
+	}
+
+	_, err = rdb.SetBit(ctx, keys, (id - 1), 1).Result()
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// 查询是否已经点赞了
+func GiveLikeSelect(tid int64, id int64) (bool, error) {
+	var keys = getKey(tid)
+	res, err := rdb.GetBit(context.Background(), keys, (id - 1)).Result()
+	if err != nil {
+		return false, err
+	}
+
+	if res == 1 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// 点赞数量
+func GiveLikeCount(tid int64) (int64, error) {
+	var keys = getKey(tid)
+	count := redis.BitCount{Start: 0, End: -1}
+	return rdb.BitCount(context.Background(), keys, &count).Result()
+}
+
 func obtainStudent(ctx context.Context, db *sql.DB) ([]string, error) {
 	var names []string
 	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)

@@ -50,12 +50,24 @@
     {{.Message}}
 </div>
 
-
 <a href="/studentSelect" class="button-link">
     <button type="button">继续选课</button>
 </a>
 
+<!-- 投票部分 -->
+<h3>请选择你最喜欢的老师:</h3>
+<form method="GET">
+    <input type="radio" id="mathTeacher" name="favoriteTeacher" value="math">
+    <label for="mathTeacher">数学老师</label><br>
 
+    <input type="radio" id="chineseTeacher" name="favoriteTeacher" value="chinese">
+    <label for="chineseTeacher">语文老师</label><br>
+
+    <input type="radio" id="englishTeacher" name="favoriteTeacher" value="english">
+    <label for="englishTeacher">英语老师</label><br>
+
+    <button type="submit">投票</button>
+</form>
 
 </body>
 </html>

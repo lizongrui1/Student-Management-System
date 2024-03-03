@@ -205,3 +205,208 @@ created by net/http.(*Server).Serve in goroutine 1
 2024/03/01 15:07:23 sql: Scan error on column index 0, name "number": converting NULL to int is unsupported
 2024/03/01 15:08:20 sql: Scan error on column index 0, name "number": converting NULL to int is unsupported
 2024/03/01 15:11:33 sql: Scan error on column index 1, name "name": converting NULL to string is unsupported
+2024/03/01 19:41:46 http: panic serving 127.0.0.1:51772: runtime error: invalid memory address or nil pointer dereference
+goroutine 43 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1898 +0xbe
+panic({0x12f2540?, 0x1855710?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+database/sql.(*DB).conn(0x0, {0x146fb70, 0x18fd240}, 0x1)
+	C:/Program Files/Go/src/database/sql/sql.go:1310 +0x54
+database/sql.(*DB).query(0x0, {0x146fb70, 0x18fd240}, {0x13baf8e, 0x2d}, {0xc000037868, 0x1, 0x1}, 0x80?)
+	C:/Program Files/Go/src/database/sql/sql.go:1749 +0x57
+database/sql.(*DB).QueryContext.func1(0x30?)
+	C:/Program Files/Go/src/database/sql/sql.go:1732 +0x4f
+database/sql.(*DB).retry(0x1878600?, 0xc000037748)
+	C:/Program Files/Go/src/database/sql/sql.go:1566 +0x42
+database/sql.(*DB).QueryContext(0x10?, {0x146fb70?, 0x18fd240?}, {0x13baf8e?, 0x0?}, {0xc000037868?, 0xc000037808?, 0xcff2c5?})
+	C:/Program Files/Go/src/database/sql/sql.go:1731 +0xc5
+database/sql.(*DB).QueryRowContext(...)
+	C:/Program Files/Go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0xc0000f6919?, {0x13baf8e?, 0x2?}, {0xc000037868?, 0xc0004f45a8?, 0x0?})
+	C:/Program Files/Go/src/database/sql/sql.go:1846 +0x45
+StudentManagementSystem/module.validate({0xc0000f6919, 0x4}, {0xc0000f6927, 0x3}, {0x139d3d9, 0x7})
+	D:/goProject/stu/module/web.go:553 +0x1aa
+StudentManagementSystem/module.LoginHandler({0x146f1c0, 0xc0005000e0}, 0xc0004ecc60)
+	D:/goProject/stu/module/web.go:282 +0x17e
+net/http.HandlerFunc.ServeHTTP(0x1877e50?, {0x146f1c0?, 0xc0005000e0?}, 0x10?)
+	C:/Program Files/Go/src/net/http/server.go:2166 +0x29
+net/http.(*ServeMux).ServeHTTP(0xd021c5?, {0x146f1c0, 0xc0005000e0}, 0xc0004ecc60)
+	C:/Program Files/Go/src/net/http/server.go:2683 +0x1ad
+net/http.serverHandler.ServeHTTP({0x146dbb0?}, {0x146f1c0?, 0xc0005000e0?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3137 +0x8e
+net/http.(*conn).serve(0xc0003163f0, {0x146fc88, 0xc0003148a0})
+	C:/Program Files/Go/src/net/http/server.go:2039 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
+2024/03/01 19:41:46 http: panic serving 127.0.0.1:51773: runtime error: invalid memory address or nil pointer dereference
+goroutine 21 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1898 +0xbe
+panic({0x12f2540?, 0x1855710?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+database/sql.(*DB).conn(0x0, {0x146fb70, 0x18fd240}, 0x1)
+	C:/Program Files/Go/src/database/sql/sql.go:1310 +0x54
+database/sql.(*DB).query(0x0, {0x146fb70, 0x18fd240}, {0x13baf8e, 0x2d}, {0xc000037868, 0x1, 0x1}, 0x80?)
+	C:/Program Files/Go/src/database/sql/sql.go:1749 +0x57
+database/sql.(*DB).QueryContext.func1(0x30?)
+	C:/Program Files/Go/src/database/sql/sql.go:1732 +0x4f
+database/sql.(*DB).retry(0x1878600?, 0xc000037748)
+	C:/Program Files/Go/src/database/sql/sql.go:1566 +0x42
+database/sql.(*DB).QueryContext(0x10?, {0x146fb70?, 0x18fd240?}, {0x13baf8e?, 0x0?}, {0xc000037868?, 0xc000037808?, 0xcff2c5?})
+	C:/Program Files/Go/src/database/sql/sql.go:1731 +0xc5
+database/sql.(*DB).QueryRowContext(...)
+	C:/Program Files/Go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0xc0000f69b9?, {0x13baf8e?, 0x2?}, {0xc000037868?, 0xc0004f4868?, 0x0?})
+	C:/Program Files/Go/src/database/sql/sql.go:1846 +0x45
+StudentManagementSystem/module.validate({0xc0000f69b9, 0x4}, {0xc0000f69c7, 0x3}, {0x139d3d9, 0x7})
+	D:/goProject/stu/module/web.go:553 +0x1aa
+StudentManagementSystem/module.LoginHandler({0x146f1c0, 0xc0005001c0}, 0xc0003207e0)
+	D:/goProject/stu/module/web.go:282 +0x17e
+net/http.HandlerFunc.ServeHTTP(0x1877e50?, {0x146f1c0?, 0xc0005001c0?}, 0x10?)
+	C:/Program Files/Go/src/net/http/server.go:2166 +0x29
+net/http.(*ServeMux).ServeHTTP(0xd021c5?, {0x146f1c0, 0xc0005001c0}, 0xc0003207e0)
+	C:/Program Files/Go/src/net/http/server.go:2683 +0x1ad
+net/http.serverHandler.ServeHTTP({0x146dbb0?}, {0x146f1c0?, 0xc0005001c0?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3137 +0x8e
+net/http.(*conn).serve(0xc0000a0120, {0x146fc88, 0xc0003148a0})
+	C:/Program Files/Go/src/net/http/server.go:2039 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
+2024/03/01 19:41:46 http: panic serving 127.0.0.1:51794: runtime error: invalid memory address or nil pointer dereference
+goroutine 25 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1898 +0xbe
+panic({0x12f2540?, 0x1855710?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+database/sql.(*DB).conn(0x0, {0x146fb70, 0x18fd240}, 0x1)
+	C:/Program Files/Go/src/database/sql/sql.go:1310 +0x54
+database/sql.(*DB).query(0x0, {0x146fb70, 0x18fd240}, {0x13baf8e, 0x2d}, {0xc000435868, 0x1, 0x1}, 0x80?)
+	C:/Program Files/Go/src/database/sql/sql.go:1749 +0x57
+database/sql.(*DB).QueryContext.func1(0x30?)
+	C:/Program Files/Go/src/database/sql/sql.go:1732 +0x4f
+database/sql.(*DB).retry(0x1878600?, 0xc000435748)
+	C:/Program Files/Go/src/database/sql/sql.go:1566 +0x42
+database/sql.(*DB).QueryContext(0x10?, {0x146fb70?, 0x18fd240?}, {0x13baf8e?, 0x0?}, {0xc000435868?, 0xc000435808?, 0xcff2c5?})
+	C:/Program Files/Go/src/database/sql/sql.go:1731 +0xc5
+database/sql.(*DB).QueryRowContext(...)
+	C:/Program Files/Go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0xc00033e1e9?, {0x13baf8e?, 0x2?}, {0xc000435868?, 0xc0003505a8?, 0x0?})
+	C:/Program Files/Go/src/database/sql/sql.go:1846 +0x45
+StudentManagementSystem/module.validate({0xc00033e1e9, 0x4}, {0xc00033e1f7, 0x3}, {0x139d3d9, 0x7})
+	D:/goProject/stu/module/web.go:553 +0x1aa
+StudentManagementSystem/module.LoginHandler({0x146f1c0, 0xc0003641c0}, 0xc000321320)
+	D:/goProject/stu/module/web.go:282 +0x17e
+net/http.HandlerFunc.ServeHTTP(0x1877e50?, {0x146f1c0?, 0xc0003641c0?}, 0x10?)
+	C:/Program Files/Go/src/net/http/server.go:2166 +0x29
+net/http.(*ServeMux).ServeHTTP(0xd021c5?, {0x146f1c0, 0xc0003641c0}, 0xc000321320)
+	C:/Program Files/Go/src/net/http/server.go:2683 +0x1ad
+net/http.serverHandler.ServeHTTP({0x146dbb0?}, {0x146f1c0?, 0xc0003641c0?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3137 +0x8e
+net/http.(*conn).serve(0xc0000a03f0, {0x146fc88, 0xc0003148a0})
+	C:/Program Files/Go/src/net/http/server.go:2039 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
+2024/03/01 19:44:22 http: panic serving 127.0.0.1:52370: runtime error: invalid memory address or nil pointer dereference
+goroutine 42 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1898 +0xbe
+panic({0x7c2540?, 0xd25710?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+database/sql.(*DB).conn(0x0, {0x93fb70, 0xdcd240}, 0x1)
+	C:/Program Files/Go/src/database/sql/sql.go:1310 +0x54
+database/sql.(*DB).query(0x0, {0x93fb70, 0xdcd240}, {0x88af8e, 0x2d}, {0xc000037868, 0x1, 0x1}, 0x80?)
+	C:/Program Files/Go/src/database/sql/sql.go:1749 +0x57
+database/sql.(*DB).QueryContext.func1(0x30?)
+	C:/Program Files/Go/src/database/sql/sql.go:1732 +0x4f
+database/sql.(*DB).retry(0xd48600?, 0xc000037748)
+	C:/Program Files/Go/src/database/sql/sql.go:1566 +0x42
+database/sql.(*DB).QueryContext(0x10?, {0x93fb70?, 0xdcd240?}, {0x88af8e?, 0x0?}, {0xc000037868?, 0xc000037808?, 0x1cf2c5?})
+	C:/Program Files/Go/src/database/sql/sql.go:1731 +0xc5
+database/sql.(*DB).QueryRowContext(...)
+	C:/Program Files/Go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0xc000026379?, {0x88af8e?, 0x2?}, {0xc000037868?, 0xc0003a8188?, 0x0?})
+	C:/Program Files/Go/src/database/sql/sql.go:1846 +0x45
+StudentManagementSystem/module.validate({0xc000026379, 0x4}, {0xc000026387, 0x3}, {0x86d3d9, 0x7})
+	D:/goProject/stu/module/web.go:553 +0x1aa
+StudentManagementSystem/module.LoginHandler({0x93f1c0, 0xc0003a4000}, 0xc000076120)
+	D:/goProject/stu/module/web.go:282 +0x17e
+net/http.HandlerFunc.ServeHTTP(0xd47e50?, {0x93f1c0?, 0xc0003a4000?}, 0x10?)
+	C:/Program Files/Go/src/net/http/server.go:2166 +0x29
+net/http.(*ServeMux).ServeHTTP(0x1d21c5?, {0x93f1c0, 0xc0003a4000}, 0xc000076120)
+	C:/Program Files/Go/src/net/http/server.go:2683 +0x1ad
+net/http.serverHandler.ServeHTTP({0x93dbb0?}, {0x93f1c0?, 0xc0003a4000?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3137 +0x8e
+net/http.(*conn).serve(0xc0003263f0, {0x93fc88, 0xc000324b70})
+	C:/Program Files/Go/src/net/http/server.go:2039 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
+2024/03/01 19:44:22 http: panic serving 127.0.0.1:52371: runtime error: invalid memory address or nil pointer dereference
+goroutine 9 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1898 +0xbe
+panic({0x7c2540?, 0xd25710?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+database/sql.(*DB).conn(0x0, {0x93fb70, 0xdcd240}, 0x1)
+	C:/Program Files/Go/src/database/sql/sql.go:1310 +0x54
+database/sql.(*DB).query(0x0, {0x93fb70, 0xdcd240}, {0x88af8e, 0x2d}, {0xc000037868, 0x1, 0x1}, 0x80?)
+	C:/Program Files/Go/src/database/sql/sql.go:1749 +0x57
+database/sql.(*DB).QueryContext.func1(0x30?)
+	C:/Program Files/Go/src/database/sql/sql.go:1732 +0x4f
+database/sql.(*DB).retry(0xc000067808?, 0xc000037748)
+	C:/Program Files/Go/src/database/sql/sql.go:1566 +0x42
+database/sql.(*DB).QueryContext(0x10?, {0x93fb70?, 0xdcd240?}, {0x88af8e?, 0x0?}, {0xc000037868?, 0xc000037808?, 0x1cf2c5?})
+	C:/Program Files/Go/src/database/sql/sql.go:1731 +0xc5
+database/sql.(*DB).QueryRowContext(...)
+	C:/Program Files/Go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0xc000026419?, {0x88af8e?, 0x2?}, {0xc000037868?, 0xc0003a8448?, 0x0?})
+	C:/Program Files/Go/src/database/sql/sql.go:1846 +0x45
+StudentManagementSystem/module.validate({0xc000026419, 0x4}, {0xc000026427, 0x3}, {0x86d3d9, 0x7})
+	D:/goProject/stu/module/web.go:553 +0x1aa
+StudentManagementSystem/module.LoginHandler({0x93f1c0, 0xc0003a40e0}, 0xc000328d80)
+	D:/goProject/stu/module/web.go:282 +0x17e
+net/http.HandlerFunc.ServeHTTP(0xd47e50?, {0x93f1c0?, 0xc0003a40e0?}, 0x10?)
+	C:/Program Files/Go/src/net/http/server.go:2166 +0x29
+net/http.(*ServeMux).ServeHTTP(0x1d21c5?, {0x93f1c0, 0xc0003a40e0}, 0xc000328d80)
+	C:/Program Files/Go/src/net/http/server.go:2683 +0x1ad
+net/http.serverHandler.ServeHTTP({0x93dbb0?}, {0x93f1c0?, 0xc0003a40e0?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3137 +0x8e
+net/http.(*conn).serve(0xc00007c120, {0x93fc88, 0xc000324b70})
+	C:/Program Files/Go/src/net/http/server.go:2039 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
+2024/03/01 19:44:22 http: panic serving 127.0.0.1:52388: runtime error: invalid memory address or nil pointer dereference
+goroutine 12 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1898 +0xbe
+panic({0x7c2540?, 0xd25710?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+database/sql.(*DB).conn(0x0, {0x93fb70, 0xdcd240}, 0x1)
+	C:/Program Files/Go/src/database/sql/sql.go:1310 +0x54
+database/sql.(*DB).query(0x0, {0x93fb70, 0xdcd240}, {0x88af8e, 0x2d}, {0xc000037868, 0x1, 0x1}, 0x80?)
+	C:/Program Files/Go/src/database/sql/sql.go:1749 +0x57
+database/sql.(*DB).QueryContext.func1(0x30?)
+	C:/Program Files/Go/src/database/sql/sql.go:1732 +0x4f
+database/sql.(*DB).retry(0xc000080008?, 0xc000037748)
+	C:/Program Files/Go/src/database/sql/sql.go:1566 +0x42
+database/sql.(*DB).QueryContext(0x10?, {0x93fb70?, 0xdcd240?}, {0x88af8e?, 0x0?}, {0xc000037868?, 0xc000037808?, 0x1cf2c5?})
+	C:/Program Files/Go/src/database/sql/sql.go:1731 +0xc5
+database/sql.(*DB).QueryRowContext(...)
+	C:/Program Files/Go/src/database/sql/sql.go:1832
+database/sql.(*DB).QueryRow(0xc0000264b9?, {0x88af8e?, 0x2?}, {0xc000037868?, 0xc0003a8708?, 0x0?})
+	C:/Program Files/Go/src/database/sql/sql.go:1846 +0x45
+StudentManagementSystem/module.validate({0xc0000264b9, 0x4}, {0xc0000264c7, 0x3}, {0x86d3d9, 0x7})
+	D:/goProject/stu/module/web.go:553 +0x1aa
+StudentManagementSystem/module.LoginHandler({0x93f1c0, 0xc0003a41c0}, 0xc000328ea0)
+	D:/goProject/stu/module/web.go:282 +0x17e
+net/http.HandlerFunc.ServeHTTP(0xd47e50?, {0x93f1c0?, 0xc0003a41c0?}, 0x10?)
+	C:/Program Files/Go/src/net/http/server.go:2166 +0x29
+net/http.(*ServeMux).ServeHTTP(0x1d21c5?, {0x93f1c0, 0xc0003a41c0}, 0xc000328ea0)
+	C:/Program Files/Go/src/net/http/server.go:2683 +0x1ad
+net/http.serverHandler.ServeHTTP({0x93dbb0?}, {0x93f1c0?, 0xc0003a41c0?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3137 +0x8e
+net/http.(*conn).serve(0xc00007c3f0, {0x93fc88, 0xc000324b70})
+	C:/Program Files/Go/src/net/http/server.go:2039 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
+2024/03/03 20:06:10 发生错误:listen tcp 127.0.0.1:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
