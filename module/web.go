@@ -193,8 +193,46 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "只允许GET方法", http.StatusMethodNotAllowed)
 		return
 	}
-
+	// 尝试从Cookie获取学生ID
 	cookie, err := r.Cookie("student_id")
+	if err != nil {
+		http.Error(w, "未授权访问", http.StatusUnauthorized)
+		return
+	}
+
+	studentID, err := strconv.ParseInt(cookie.Value, 10, 64)
+	if err != nil {
+		http.Error(w, "无效的学生ID", http.StatusBadRequest)
+		return
+	}
+
+	favoriteTeacher := r.URL.Query().Get("favoriteTeacher")
+	if favoriteTeacher != "" {
+		var tid int64
+		switch favoriteTeacher {
+		case "math":
+			tid = 1
+		case "chinese":
+			tid = 2
+		case "english":
+			tid = 3
+		}
+
+		liked, err := GiveLike(ctx, tid, studentID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("保存投票结果失败：%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		if !liked {
+			fmt.Fprintf(w, "您已经给这位老师投过票了")
+		} else {
+			fmt.Fprintf(w, "投票成功")
+		}
+		return
+	}
+
+	cookie, err = r.Cookie("student_id")
 	if err != nil {
 		http.Error(w, "未授权访问", http.StatusUnauthorized)
 		return
