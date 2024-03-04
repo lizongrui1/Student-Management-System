@@ -146,48 +146,6 @@ func renderTemplate(w http.ResponseWriter, data interface{}) {
 	}
 }
 
-//func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
-//	if r.Method == http.MethodGet {
-//		cookie, err := r.Cookie("student_id")
-//		if err != nil {
-//			// 处理cookie不存在的情况
-//			http.Error(w, "未授权访问", http.StatusUnauthorized)
-//			return
-//		}
-//		number, err := strconv.Atoi(cookie.Value)
-//		if err != nil {
-//			http.Error(w, "无效的学生ID", http.StatusBadRequest)
-//			return
-//		}
-//		stu, err := queryRow(number)
-//		if err != nil {
-//			log.Printf("查询失败，err：%v\n", err)
-//			http.Error(w, "查询失败", http.StatusInternalServerError)
-//			return
-//		}
-//		tmpl, err := template.ParseFiles("./module/templates/studentPage.html")
-//		if err != nil {
-//			log.Printf("模板解析错误：%v\n", err)
-//			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
-//			return
-//		}
-//		data := struct {
-//			Name   string
-//			Number int
-//			Score  int
-//		}{
-//			Name:   stu.Name,
-//			Number: stu.Number,
-//			Score:  stu.Score,
-//		}
-//		err = tmpl.Execute(w, data)
-//		if err != nil {
-//			log.Printf("模板渲染错误，err：%v\n", err)
-//			return
-//		}
-//	}
-//}
-
 func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "只允许GET方法", http.StatusMethodNotAllowed)
@@ -208,7 +166,7 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	favoriteTeacher := r.URL.Query().Get("favoriteTeacher")
 	if favoriteTeacher != "" {
-		var tid int64
+		//var tid int64
 		switch favoriteTeacher {
 		case "math":
 			tid = 1
@@ -218,18 +176,21 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 			tid = 3
 		}
 
-		liked, err := GiveLike(ctx, tid, studentID)
+		_, err := GiveLike(ctx, tid, studentID)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("保存投票结果失败：%v", err), http.StatusInternalServerError)
 			return
 		}
 
-		if !liked {
-			fmt.Fprintf(w, "您已经给这位老师投过票了")
-		} else {
-			fmt.Fprintf(w, "投票成功")
+		alreadyLiked, err := GiveLikeSelect(tid, studentID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("查询点赞状态失败：%v", err), http.StatusInternalServerError)
+			return
 		}
-		return
+		if alreadyLiked {
+			fmt.Fprintf(w, "你已经给这位老师投过票了")
+			return
+		}
 	}
 
 	cookie, err = r.Cookie("student_id")

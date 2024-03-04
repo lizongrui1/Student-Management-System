@@ -18,6 +18,7 @@ var db, _ = InitDB()
 
 var rdb *redis.Client
 var ctx = context.Background()
+var tid int64
 
 type myUsualType interface{}
 
@@ -35,7 +36,7 @@ func getKey(tid int64) string {
 // tid 需要点赞教师的ID   id 学生ID
 func GiveLike(ctx context.Context, tid int64, id int64) (bool, error) {
 	keys := getKey(tid)
-	res, err := rdb.GetBit(ctx, keys, (id - 1)).Result()
+	res, err := rdb.GetBit(ctx, keys, id-1).Result()
 	if err != nil {
 		return false, err
 	}
@@ -44,7 +45,7 @@ func GiveLike(ctx context.Context, tid int64, id int64) (bool, error) {
 		return true, nil
 	}
 
-	_, err = rdb.SetBit(ctx, keys, (id - 1), 1).Result()
+	_, err = rdb.SetBit(ctx, keys, id-1, 1).Result()
 	if err != nil {
 		return false, err
 	}
@@ -55,7 +56,7 @@ func GiveLike(ctx context.Context, tid int64, id int64) (bool, error) {
 // 查询是否已经点赞了
 func GiveLikeSelect(tid int64, id int64) (bool, error) {
 	var keys = getKey(tid)
-	res, err := rdb.GetBit(context.Background(), keys, (id - 1)).Result()
+	res, err := rdb.GetBit(context.Background(), keys, id-1).Result()
 	if err != nil {
 		return false, err
 	}
