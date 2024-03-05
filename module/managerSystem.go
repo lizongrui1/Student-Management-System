@@ -28,6 +28,8 @@ type Student struct {
 	Score  int    `json:"score"`
 }
 
+
+
 // 投票功能
 func getKey(tid int64) string {
 	return fmt.Sprintf("teacher:like:%d", tid)
