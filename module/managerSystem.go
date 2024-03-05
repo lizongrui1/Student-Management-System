@@ -28,7 +28,47 @@ type Student struct {
 	Score  int    `json:"score"`
 }
 
+type UserSign struct {
+}
 
+// 签到功能
+func (u UserSign) DoSign(ctx context.Context, id int) error {
+	var offset = time.Now().Local().Day() - 1
+	var keys = u.buildSignKey(id)
+	_, err := rdb.SetBit(ctx, keys, int64(offset), 1).Result()
+	if err != nil {
+		return err
+	}
+	defer rdb.Close()
+	return nil
+}
+
+// 判断用户是都已经签到了
+func (u UserSign) CheckSign(id int) (int64, error) {
+	var offset = time.Now().Local().Day() - 1
+	var keys = u.buildSignKey(id)
+	defer rdb.Close()
+	return rdb.GetBit(ctx, keys, int64(offset)).Result()
+}
+
+// 获取学生签到的次数
+func (u UserSign) GetSignCount(id int) (int64, error) {
+	var keys = u.buildSignKey(id)
+	defer rdb.Close()
+	count := redis.BitCount{Start: 0, End: 31}
+	return rdb.BitCount(ctx, keys, &count).Result()
+}
+
+// 构建一个用于签到的键值
+func (s UserSign) buildSignKey(id int) string {
+	var nowDate = s.formatDate()
+	return fmt.Sprintf("stu:sign:%d:%s", id, nowDate)
+}
+
+// 获取当前的日期
+func (s UserSign) formatDate() string {
+	return time.Now().Format("2006-01")
+}
 
 // 投票功能
 func getKey(tid int64) string {
