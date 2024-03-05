@@ -44,7 +44,7 @@ func ShowStudentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MessageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("表单解析错误: %v\n", err)
@@ -327,7 +327,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == http.MethodGet {
 		http.ServeFile(w, r, "./module/templates/query.html")
 		return
 	} else if r.Method == "POST" {
@@ -373,7 +373,7 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == http.MethodGet {
 		ctx := r.Context()
 		//students, err := queryMultiRow()
 		students, err := studentsScore(ctx, db, rdb)
@@ -400,7 +400,7 @@ func QueryAllRowHandler(w http.ResponseWriter, r *http.Request) {
 
 // 添加学生信息的Handler
 func InsertRowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("InsertRowHandler：表单解析出错: %v\n", err)
@@ -454,7 +454,7 @@ func InsertRowHandler(w http.ResponseWriter, r *http.Request) {
 
 // 修改学生信息的Handler
 func UpdateRowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == http.MethodPost {
 		//POST请求（写）
 		err := r.ParseForm()
 		if err != nil {
@@ -500,7 +500,7 @@ func UpdateRowHandler(w http.ResponseWriter, r *http.Request) {
 
 // 删除学生信息
 func DeleteRowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("表单解析错误: %v\n", err)
