@@ -176,15 +176,15 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 			tid = 3
 		}
 
-		var stu UserSign
-		err = stu.DoSign(ctx, int(studentID))
+		var u UserSign
+		err := u.DoSign(ctx, int(studentID))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("学生签到失败：%v", err), http.StatusInternalServerError)
 			return
 		}
-		_, err := stu.CheckSign(int(studentID))
+		_, err = u.CheckSign(int(studentID))
 		if err != nil {
-			http.Error(w, fmt.Sprintf("签到判断失败：%v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("签到检查失败：%v", err), http.StatusInternalServerError)
 			return
 		}
 

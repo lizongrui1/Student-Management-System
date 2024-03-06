@@ -410,3 +410,5 @@ net/http.(*conn).serve(0xc00007c3f0, {0x93fc88, 0xc000324b70})
 created by net/http.(*Server).Serve in goroutine 1
 	C:/Program Files/Go/src/net/http/server.go:3285 +0x4b4
 2024/03/03 20:06:10 发生错误:listen tcp 127.0.0.1:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+2024/03/06 21:22:38 无法将用户信息存储到Redis：redis: client is closed
+2024/03/06 21:22:42 无法将用户信息存储到Redis：redis: client is closed

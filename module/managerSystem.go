@@ -33,13 +33,12 @@ type UserSign struct {
 
 // 签到功能
 func (u UserSign) DoSign(ctx context.Context, id int) error {
-	var offset = time.Now().Local().Day() - 1
+	var offset = time.Now().Local().Day() - 1 //其中减1是为了得到一个从0开始的索引
 	var keys = u.buildSignKey(id)
 	_, err := rdb.SetBit(ctx, keys, int64(offset), 1).Result()
 	if err != nil {
 		return err
 	}
-	defer rdb.Close()
 	return nil
 }
 
@@ -47,26 +46,64 @@ func (u UserSign) DoSign(ctx context.Context, id int) error {
 func (u UserSign) CheckSign(id int) (int64, error) {
 	var offset = time.Now().Local().Day() - 1
 	var keys = u.buildSignKey(id)
-	defer rdb.Close()
 	return rdb.GetBit(ctx, keys, int64(offset)).Result()
 }
 
 // 获取学生签到的次数
 func (u UserSign) GetSignCount(id int) (int64, error) {
 	var keys = u.buildSignKey(id)
-	defer rdb.Close()
 	count := redis.BitCount{Start: 0, End: 31}
 	return rdb.BitCount(ctx, keys, &count).Result()
 }
 
+// 获取学生首次签到的日期
+func (u UserSign) GetFirstSignDate(uid int) (string, error) {
+	var keys = u.buildSignKey(uid)
+	pos, err := rdb.BitPos(ctx, keys, 1).Result() //获取第一位为1的位置
+	if err != nil {
+		return "", err
+	}
+	pos = pos + 1
+
+	var day = time.Now().Local().Day()
+
+	var offsetDay = (day - int(pos)) * -1
+
+	return time.Now().AddDate(0, 0, offsetDay).Format("2006-01-02"), nil
+}
+
+// 获取学生当月签到情况
+func (u UserSign) GetSignInfo(uid int) (interface{}, error) {
+	var keys = u.buildSignKey(uid)
+	var day = time.Now().Local().Day()
+	var dddd = fmt.Sprintf("u%d", day)
+	st, _ := rdb.Do(ctx, keys, "GET", dddd, 0).Result()
+	f := st.([]interface{})
+	var res = make([]bool, 0)
+	var days = make([]string, 0)
+	var v = f[0].(int64)
+	fmt.Println(v)
+	for i := day; i > 0; i-- {
+		var pos = (day - i) * -1
+		var keys = time.Now().Local().AddDate(0, 0, pos).Format("2006-01-02")
+		days = append(days, keys)
+		var value = v>>1<<1 != v
+		res = append(res, value)
+		v >>= 1
+	}
+	fmt.Println(res)
+	fmt.Println(days)
+	return nil, nil
+}
+
 // 构建一个用于签到的键值
-func (s UserSign) buildSignKey(id int) string {
-	var nowDate = s.formatDate()
+func (u UserSign) buildSignKey(id int) string {
+	var nowDate = u.formatDate()
 	return fmt.Sprintf("stu:sign:%d:%s", id, nowDate)
 }
 
 // 获取当前的日期
-func (s UserSign) formatDate() string {
+func (u UserSign) formatDate() string {
 	return time.Now().Format("2006-01")
 }
 
@@ -84,7 +121,7 @@ func GiveLike(ctx context.Context, tid int64, id int64) (bool, error) {
 	}
 
 	if res == 1 {
-		return true, nil
+		return false, err
 	}
 
 	_, err = rdb.SetBit(ctx, keys, id-1, 1).Result()
