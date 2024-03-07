@@ -45,7 +45,8 @@ func main() {
 	}
 
 	// 创建日志文件
-	file, err := os.OpenFile("student_management_system.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666) // 如果文件不存在就创建它，然后以只写模式打开，且写入的数据追加到文件末尾
+	// 如果文件不存在就创建它，然后以只写模式打开，且写入的数据追加到文件末尾
+	file, err := os.OpenFile("student_management_system.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,6 +79,7 @@ func main() {
 	})
 	http.HandleFunc("/sendMessage", module.MessageHandler)
 	http.HandleFunc("/integral", module.ShowStudentHandler)
+	http.HandleFunc("/signIn", module.SignInHandler)
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

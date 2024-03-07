@@ -32,17 +32,20 @@ type UserSign struct {
 }
 
 // 签到功能
-func (u UserSign) DoSign(ctx context.Context, id int) error {
+func (u UserSign) DoSign(ctx context.Context, id int) (bool, string, error) {
 	var offset = time.Now().Local().Day() - 1 //其中减1是为了得到一个从0开始的索引
 	var keys = u.buildSignKey(id)
-	_, err := rdb.SetBit(ctx, keys, int64(offset), 1).Result()
+	signed, err := rdb.SetBit(ctx, keys, int64(offset), 1).Result()
 	if err != nil {
-		return err
+		return false, "", err
 	}
-	return nil
+	if signed == 1 {
+		return true, "签到成功", nil
+	}
+	return false, "签到失败", nil
 }
 
-// 判断用户是都已经签到了
+// 判断学生是否都已经签到了
 func (u UserSign) CheckSign(id int) (int64, error) {
 	var offset = time.Now().Local().Day() - 1
 	var keys = u.buildSignKey(id)
@@ -107,7 +110,7 @@ func (u UserSign) formatDate() string {
 	return time.Now().Format("2006-01")
 }
 
-// 投票功能
+// 点赞功能
 func getKey(tid int64) string {
 	return fmt.Sprintf("teacher:like:%d", tid)
 }
@@ -213,7 +216,7 @@ func studentsScore(ctx context.Context, db *sql.DB, rdb *redis.Client) ([]Studen
 		log.Fatal(err)
 		return nil, err
 	}
-	results, err := rdb.ZRangeWithScores(ctx, "students", 0, -1).Result()
+	results, err := rdb.ZRevRangeWithScores(ctx, "students", 0, -1).Result()
 	if err != nil {
 		log.Printf("获取学生分数失败, err:%v\n", err)
 		return nil, err
