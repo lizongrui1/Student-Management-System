@@ -412,3 +412,30 @@ created by net/http.(*Server).Serve in goroutine 1
 2024/03/03 20:06:10 发生错误:listen tcp 127.0.0.1:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
 2024/03/06 21:22:38 无法将用户信息存储到Redis：redis: client is closed
 2024/03/06 21:22:42 无法将用户信息存储到Redis：redis: client is closed
+2024/03/07 21:49:50 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:49:50 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:52:08 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:52:08 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:56:07 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:56:07 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:56:12 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:56:12 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:56:14 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:56:14 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:57:39 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:57:39 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:57:42 模板渲染错误，err：template: studentPage.html:46:14: executing "studentPage.html" at <.Name>: can't evaluate field Name in type struct { SignCount int64 }
+2024/03/07 21:57:42 http: superfluous response.WriteHeader call from StudentManagementSystem/module.SignInHandler (web.go:281)
+2024/03/07 21:57:42 http: superfluous response.WriteHeader call from StudentManagementSystem/module.SignInHandler (web.go:283)
+2024/03/07 21:58:42 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:58:42 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:58:50 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:58:50 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 21:59:21 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 21:59:21 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 22:01:27 模板渲染错误，err：template: studentPage.html:80:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 22:01:27 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 22:01:42 模板渲染错误，err：template: studentPage.html:76:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 22:01:42 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)
+2024/03/07 22:01:59 模板渲染错误，err：template: studentPage.html:89:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/07 22:01:59 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:237)

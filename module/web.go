@@ -32,7 +32,7 @@ func init() {
 func ShowStudentHandler(w http.ResponseWriter, r *http.Request) {
 	names, err := obtainStudent(context.Background(), db)
 	if err != nil {
-		http.Error(w, "Failed to obtain student names", http.StatusInternalServerError)
+		http.Error(w, "获取学生姓名失败", http.StatusInternalServerError)
 		return
 	}
 
@@ -44,7 +44,7 @@ func ShowStudentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MessageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("表单解析错误: %v\n", err)
@@ -176,18 +176,6 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 			tid = 3
 		}
 
-		var u UserSign
-		err := u.DoSign(ctx, int(studentID))
-		if err != nil {
-			http.Error(w, fmt.Sprintf("学生签到失败：%v", err), http.StatusInternalServerError)
-			return
-		}
-		_, err = u.CheckSign(int(studentID))
-		if err != nil {
-			http.Error(w, fmt.Sprintf("签到检查失败：%v", err), http.StatusInternalServerError)
-			return
-		}
-
 		_, err = GiveLike(ctx, tid, studentID)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("保存投票结果失败：%v", err), http.StatusInternalServerError)
@@ -250,8 +238,52 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func SignInHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "只允许POST方法", http.StatusMethodNotAllowed)
+		return
+	}
+	cookie, err := r.Cookie("student_id")
+	if err != nil {
+		http.Error(w, "未授权访问", http.StatusUnauthorized)
+		return
+	}
+	studentID, err := strconv.Atoi(cookie.Value)
+	if err != nil {
+		http.Error(w, "无效的学生ID", http.StatusBadRequest)
+		return
+	}
+
+	var u UserSign
+	signed, message, err := u.DoSign(ctx, studentID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("学生签到失败：%v", err), http.StatusInternalServerError)
+		return
+	}
+	if signed {
+		w.Write([]byte(message))
+		return
+	}
+	count, err := u.GetSignCount(studentID)
+	data := struct {
+		SignCount int64
+	}{
+		SignCount: count,
+	}
+	tmpl, err := template.ParseFiles("module/templates/studentPage.html")
+	if err != nil {
+		log.Printf("模板解析错误：%v\n", err)
+		http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.Execute(w, data); err != nil {
+		log.Printf("模板渲染错误，err：%v\n", err)
+		http.Error(w, "模板执行错误", http.StatusInternalServerError)
+	}
+}
+
 func RegisterStudentHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
+	if r.Method != http.MethodGet {
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("表单解析错误，err:%v\n", err)
