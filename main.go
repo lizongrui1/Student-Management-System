@@ -80,6 +80,7 @@ func main() {
 	http.HandleFunc("/sendMessage", module.MessageHandler)
 	http.HandleFunc("/integral", module.ShowStudentHandler)
 	http.HandleFunc("/signIn", module.SignInHandler)
+	http.HandleFunc("/ConcurrencyQueries", module.ConcurrencyHandler)
 
 	fmt.Println("学生管理系统运行在： http://127.0.0.1:8080， 按 CTRL + C 退出系统。")
 	err = http.ListenAndServe("localhost:8080", nil)

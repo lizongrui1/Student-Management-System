@@ -29,6 +29,25 @@ func init() {
 	}()
 }
 
+func ConcurrencyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	var wg sync.WaitGroup
+	concurrencyLevel := 100
+	wg.Add(concurrencyLevel)
+	for i := 0; i < concurrencyLevel; i++ {
+		go func(i int) {
+			defer wg.Done()
+			executeDBOperations(db, i)
+		}(i)
+	}
+
+	wg.Wait()
+	w.Write([]byte("并发查询已完成"))
+}
+
 func ShowStudentHandler(w http.ResponseWriter, r *http.Request) {
 	names, err := obtainStudent(context.Background(), db)
 	if err != nil {

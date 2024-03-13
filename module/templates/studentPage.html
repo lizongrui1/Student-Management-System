@@ -82,6 +82,10 @@
     <button type="submit">签到</button>
 </form>
 
+<form action="/ConcurrencyQueries" method="post">
+    <button type="submit">模拟并发查询</button>
+</form>
+
 
 <a href="/logout" class="button-link logout-button">
     <button type="button">退出</button>
@@ -90,6 +94,7 @@
 <div class="info-box">
     您本月已经签到<span id="signCount">{{.SignCount}}</span>次
 </div>
+
 
 </body>
 </html>
