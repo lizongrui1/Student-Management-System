@@ -34,18 +34,39 @@ func ConcurrencyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
-	var wg sync.WaitGroup
-	concurrencyLevel := 100
-	wg.Add(concurrencyLevel)
-	for i := 0; i < concurrencyLevel; i++ {
-		go func(i int) {
-			defer wg.Done()
-			executeDBOperations(db, i)
-		}(i)
-	}
+	//var wg sync.WaitGroup
+	//concurrencyLevel := 100
+	//wg.Add(concurrencyLevel)
+	//for i := 0; i < concurrencyLevel; i++ {
+	//	go func(i int) {
+	//		defer wg.Done()
+	//		//executeDBOperationsWithSharedLock(db, i)
+	//		executeDBOperationsWithExclusiveLock(db, i)
+	//	}(i)
+	//}
+	//
+	//wg.Wait()
+	w.Write([]byte("并发操作已完成"))
 
-	wg.Wait()
-	w.Write([]byte("并发查询已完成"))
+	go task1()
+	go task2()
+	time.Sleep(time.Second * 2)
+}
+
+func task1() {
+	for i := 0; i < 5; i++ {
+		executeDBOperationsWithExclusiveLock1(db, i)
+		fmt.Println("Task 1 -", i)
+		time.Sleep(time.Millisecond * 500)
+	}
+}
+
+func task2() {
+	for i := 0; i < 5; i++ {
+		executeDBOperationsWithExclusiveLock2(db, i)
+		fmt.Println("Task 2 -", i)
+		time.Sleep(time.Millisecond * 500)
+	}
 }
 
 func ShowStudentHandler(w http.ResponseWriter, r *http.Request) {

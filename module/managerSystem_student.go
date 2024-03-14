@@ -65,6 +65,113 @@ func executeDBOperations(db *sql.DB, id int) {
 	fmt.Printf("Goroutine %d 已完成\n", id)
 }
 
+func executeDBOperationsWithSharedLock(db *sql.DB, id int) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Printf("事务初始错误: %v\n", err)
+		return
+	}
+	defer tx.Rollback()
+
+	//_, err = tx.Exec("INSERT INTO sms (column_names) VALUES (values)")
+	//if err != nil {
+	//	fmt.Printf("Exec insert error: %v\n", err)
+	//	return
+	//}
+
+	_, err = tx.Exec("SELECT `score` FROM sms WHERE `id` = 26 AND `number` = 2416 LOCK IN SHARE MODE")
+	if err != nil {
+		fmt.Printf("Exec update error: %v\n", err)
+		return
+	}
+
+	//_, err = tx.Exec("DELETE FROM sms WHERE id = ?", 25)
+	//if err != nil {
+	//	fmt.Printf("Exec delete error: %v\n", err)
+	//	return
+	//}
+
+	err = tx.Commit()
+	if err != nil {
+		fmt.Printf("事务提交失败: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Goroutine %d 已完成\n", id)
+}
+
+func executeDBOperationsWithExclusiveLock1(db *sql.DB, id int) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Printf("事务初始错误: %v\n", err)
+		return
+	}
+	defer tx.Rollback()
+
+	var score int
+	err = tx.QueryRow("SELECT `score` FROM sms WHERE `id` = 28 AND `number` = 2418 FOR UPDATE").Scan(&score)
+	if err != nil {
+		fmt.Printf("Query error: %v\n", err)
+		return
+	}
+
+	//_, err = tx.Exec("UPDATE sms SET `score` = 80 WHERE `id` = 28 AND `number` = 2418")
+	//if err != nil {
+	//	fmt.Printf("Exec update error: %v\n", err)
+	//	return
+	//}
+
+	//_, err = tx.Exec("DELETE FROM sms WHERE `id` = 27")
+	//if err != nil {
+	//	fmt.Printf("Exec delete error: %v\n", err)
+	//	return
+	//}
+
+	err = tx.Commit()
+	if err != nil {
+		fmt.Printf("事务提交失败: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Goroutine %d 已完成\n", id)
+}
+
+func executeDBOperationsWithExclusiveLock2(db *sql.DB, id int) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Printf("事务初始错误: %v\n", err)
+		return
+	}
+	defer tx.Rollback()
+
+	//var score int
+	//err = tx.QueryRow("SELECT `score` FROM sms WHERE `id` = 28 AND `number` = 2418 FOR UPDATE").Scan(&score)
+	//if err != nil {
+	//	fmt.Printf("Query error: %v\n", err)
+	//	return
+	//}
+
+	_, err = tx.Exec("UPDATE sms SET `score` = 70 WHERE `id` = 28 AND `number` = 2418")
+	if err != nil {
+		fmt.Printf("Exec update error: %v\n", err)
+		return
+	}
+
+	//_, err = tx.Exec("DELETE FROM sms WHERE `id` = 27")
+	//if err != nil {
+	//	fmt.Printf("Exec delete error: %v\n", err)
+	//	return
+	//}
+
+	err = tx.Commit()
+	if err != nil {
+		fmt.Printf("事务提交失败: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Goroutine %d 已完成\n", id)
+}
+
 // 签到功能
 func (u UserSign) DoSign(ctx context.Context, id int) (bool, string, error) {
 	var offset = time.Now().Local().Day() - 1 //其中减1是为了得到一个从0开始的索引
