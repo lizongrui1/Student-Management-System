@@ -55,12 +55,12 @@ func ConcurrencyHandler(w http.ResponseWriter, r *http.Request) {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		Lock1(db)
+		Lock5(db)
 	}()
 
 	go func() {
 		defer wg.Done()
-		Lock2(db)
+		Lock6(db)
 	}()
 	wg.Wait()
 	w.Write([]byte("并发操作已完成"))

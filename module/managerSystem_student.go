@@ -222,6 +222,96 @@ func Lock2(db *sql.DB) {
 	}
 }
 
+func Lock3(db *sql.DB) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println("开启事务失败:", err)
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("SELECT * FROM sms WHERE id = 25 FOR UPDATE")
+	if err != nil {
+		fmt.Println("获取锁失败:", err)
+		return
+	}
+	_, err = tx.Exec("UPDATE sms SET points = points + 10 WHERE id = 25")
+	if err != nil {
+		fmt.Println("更新失败:", err)
+		return
+	}
+	time.Sleep(time.Second * 10)
+	err = tx.Commit()
+	if err != nil {
+		fmt.Printf("事务提交失败:", err)
+		return
+	}
+}
+
+func Lock4(db *sql.DB) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println("实物开启失败:", err)
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("SELECT * FROM sms WHERE id = 25 FOR UPDATE")
+	if err != nil {
+		fmt.Println("获取锁失败:", err)
+		return
+	}
+	_, err = tx.Exec("UPDATE sms SET points = points - 5 WHERE id = 25")
+	if err != nil {
+		fmt.Println("更新失败:", err)
+		return
+	}
+	time.Sleep(time.Second * 1)
+	err = tx.Commit()
+	if err != nil {
+		fmt.Println("事务提交失败:", err)
+		return
+	}
+}
+
+func Lock5(db *sql.DB) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println("开启事务失败:", err)
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("SELECT * FROM sms WHERE id > 24 FOR UPDATE")
+	if err != nil {
+		fmt.Println("获取锁失败:", err)
+		return
+	}
+	time.Sleep(time.Second * 10)
+	err = tx.Commit()
+	if err != nil {
+		fmt.Printf("事务提交失败:", err)
+		return
+	}
+}
+
+func Lock6(db *sql.DB) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println("实物开启失败:", err)
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("SELECT * FROM sms WHERE id = 28 FOR UPDATE")
+	if err != nil {
+		fmt.Println("获取锁失败:", err)
+		return
+	}
+	time.Sleep(time.Second * 1)
+	err = tx.Commit()
+	if err != nil {
+		fmt.Println("事务提交失败:", err)
+		return
+	}
+}
+
 // 签到功能
 func (u UserSign) DoSign(ctx context.Context, id int) (bool, string, error) {
 	var offset = time.Now().Local().Day() - 1 //其中减1是为了得到一个从0开始的索引
