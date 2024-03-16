@@ -46,11 +46,24 @@ func ConcurrencyHandler(w http.ResponseWriter, r *http.Request) {
 	//}
 	//
 	//wg.Wait()
-	w.Write([]byte("并发操作已完成"))
 
-	go task1()
-	go task2()
-	time.Sleep(time.Second * 2)
+	//go task1()
+	//go task2()
+	//time.Sleep(time.Second * 2)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		Lock1(db)
+	}()
+
+	go func() {
+		defer wg.Done()
+		Lock2(db)
+	}()
+	wg.Wait()
+	w.Write([]byte("并发操作已完成"))
 }
 
 func task1() {

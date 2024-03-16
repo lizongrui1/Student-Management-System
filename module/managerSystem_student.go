@@ -103,7 +103,7 @@ func executeDBOperationsWithSharedLock(db *sql.DB, id int) {
 func executeDBOperationsWithExclusiveLock1(db *sql.DB, id int) {
 	tx, err := db.Begin()
 	if err != nil {
-		fmt.Printf("事务初始错误: %v\n", err)
+		fmt.Println("开启事务失败:", err)
 		return
 	}
 	defer tx.Rollback()
@@ -139,7 +139,7 @@ func executeDBOperationsWithExclusiveLock1(db *sql.DB, id int) {
 func executeDBOperationsWithExclusiveLock2(db *sql.DB, id int) {
 	tx, err := db.Begin()
 	if err != nil {
-		fmt.Printf("事务初始错误: %v\n", err)
+		fmt.Println("开启事务失败:", err)
 		return
 	}
 	defer tx.Rollback()
@@ -170,6 +170,56 @@ func executeDBOperationsWithExclusiveLock2(db *sql.DB, id int) {
 	}
 
 	fmt.Printf("Goroutine %d 已完成\n", id)
+}
+
+func Lock1(db *sql.DB) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println("开启事务失败:", err)
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("SELECT * FROM sms WHERE id = 30 FOR UPDATE")
+	if err != nil {
+		fmt.Println("获取锁失败:", err)
+		return
+	}
+	_, err = tx.Exec("UPDATE sms SET points = points + 10 WHERE id = 30")
+	if err != nil {
+		fmt.Println("更新失败:", err)
+		return
+	}
+	time.Sleep(time.Second * 10)
+	err = tx.Commit()
+	if err != nil {
+		fmt.Printf("事务提交失败:", err)
+		return
+	}
+}
+
+func Lock2(db *sql.DB) {
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println("实物开启失败:", err)
+		return
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("SELECT * FROM sms WHERE id = 30 FOR UPDATE")
+	if err != nil {
+		fmt.Println("获取锁失败:", err)
+		return
+	}
+	_, err = tx.Exec("UPDATE sms SET points = points - 5 WHERE id = 30")
+	if err != nil {
+		fmt.Println("更新失败:", err)
+		return
+	}
+	time.Sleep(time.Second * 1)
+	err = tx.Commit()
+	if err != nil {
+		fmt.Println("事务提交失败:", err)
+		return
+	}
 }
 
 // 签到功能
