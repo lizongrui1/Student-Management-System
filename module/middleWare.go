@@ -7,12 +7,46 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
+	"github.com/streadway/amqp"
 	"log"
 	"os"
 	"time"
 )
 
 //var tpl *template.Template
+
+func NewChannel(conn *amqp.Connection) (*amqp.Channel, error) {
+	ch, err := conn.Channel()
+	if err != nil {
+		return nil, fmt.Errorf("创建通道失败: %w", err)
+	}
+
+	_, err = ch.QueueDeclare(
+		"hello",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("创建队列失败: %w", err)
+	}
+	body := "Hello"
+	err = ch.Publish(
+		"",
+		"hello",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        []byte(body),
+		})
+	if err != nil {
+		return nil, fmt.Errorf("发送消息失败: %w", err)
+	}
+	return ch, nil
+}
 
 func InitDB() (*sql.DB, error) {
 	Initconfig()
@@ -91,5 +125,11 @@ func Initconfig() {
 	viper.AddConfigPath(workDir + "/config")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("读取配置文件失败，err：%s", err.Error())
+	}
+}
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("someFunction failed:%s,%s", msg, err)
 	}
 }

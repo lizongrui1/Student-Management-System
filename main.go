@@ -6,12 +6,18 @@ import (
 	"fmt"
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
+	"github.com/streadway/amqp"
 	"log"
 	"net/http"
 	"os"
 )
 
 func main() {
+	//rabbitmq
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	failOnError(err, "连接rabbitmq失败")
+	defer conn.Close()
+
 	//mysql
 	db, err := module.InitDB()
 	if err != nil {
@@ -86,5 +92,11 @@ func main() {
 	err = http.ListenAndServe("localhost:8080", nil)
 	if err != nil {
 		log.Fatal("发生错误:", err)
+	}
+}
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("someFunction failed:%s,%s", msg, err)
 	}
 }
