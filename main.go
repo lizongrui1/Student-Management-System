@@ -18,6 +18,9 @@ func main() {
 	failOnError(err, "连接rabbitmq失败")
 	defer conn.Close()
 
+	chMsg := make(chan string)
+	go module.ConsumerMessage(conn, chMsg)
+
 	//mysql
 	db, err := module.InitDB()
 	if err != nil {
@@ -83,7 +86,18 @@ func main() {
 	http.HandleFunc("/studentSelect", func(w http.ResponseWriter, r *http.Request) {
 		module.StudentSelectHandler(w, r, db, rdb)
 	})
-	http.HandleFunc("/sendMessage", module.MessageHandler)
+	//http.HandleFunc("/sendMessage", module.MessageHandler)
+	http.HandleFunc("/sendMessage", func(w http.ResponseWriter, r *http.Request) {
+		module.MqHandler(conn, w, r)
+	})
+	http.HandleFunc("/pushMessage", func(w http.ResponseWriter, r *http.Request) {
+		select {
+		case msg := <-chMsg:
+			fmt.Fprintln(w, msg)
+		default:
+			fmt.Fprintln(w, "没有消息")
+		}
+	})
 	http.HandleFunc("/integral", module.ShowStudentHandler)
 	http.HandleFunc("/signIn", module.SignInHandler)
 	http.HandleFunc("/ConcurrencyQueries", module.ConcurrencyHandler)

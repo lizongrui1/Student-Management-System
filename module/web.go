@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"github.com/streadway/amqp"
 	"html/template"
 	"log"
 	"net/http"
@@ -110,6 +111,23 @@ func MessageHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "消息已发送")
 	} else {
 		http.ServeFile(w, r, "module/templates/sendMessage.html")
+	}
+}
+
+func MqHandler(conn *amqp.Connection, w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "解析表单失败", http.StatusInternalServerError)
+			return
+		}
+		message := r.FormValue("message")
+		if err, _ := publishMessage(conn, message); err != nil {
+			http.Error(w, "消息发送失败", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(w, "只支持Post请求", http.StatusMethodNotAllowed)
+		return
 	}
 }
 

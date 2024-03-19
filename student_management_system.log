@@ -475,3 +475,5 @@ created by net/http.(*Server).Serve in goroutine 1
 2024/03/16 21:19:16 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:290)
 2024/03/16 21:39:04 模板渲染错误，err：template: studentPage.html:95:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
 2024/03/16 21:39:04 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:290)
+2024/03/19 22:07:39 模板渲染错误，err：template: studentPage.html:107:48: executing "studentPage.html" at <.SignCount>: can't evaluate field SignCount in type struct { Name string; Number int; Score int; Message string }
+2024/03/19 22:07:39 http: superfluous response.WriteHeader call from StudentManagementSystem/module.StudentPageHandler (web.go:307)

@@ -54,8 +54,20 @@
 </table>
 
 <div id="infoBox" class="info-box">
-    最新消息：{{.Message}}
+    最新消息：<span id="messageContent">等待新消息...</span>
 </div>
+<script>
+    function fetchMessage() {
+        fetch('/pushMessage')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('messageContent').textContent = data;
+            })
+            .catch(console.error);
+    }
+    setInterval(fetchMessage, 5000);
+</script>
+
 
 
 <a href="/studentSelect" class="button-link">
