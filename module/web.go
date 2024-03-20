@@ -126,8 +126,7 @@ func MqHandler(conn *amqp.Connection, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		http.Error(w, "只支持Post请求", http.StatusMethodNotAllowed)
-		return
+		http.ServeFile(w, r, "module/templates/sendMessage.html")
 	}
 }
 
@@ -285,16 +284,24 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 	msg := lastMessage
 	lastMessageMutex.Unlock()
 
+	signCount, err := getSignCount(rdb, strconv.Itoa(stu.Number), "2024-03")
+	if err != nil {
+		fmt.Println("登录次数计算失败:", err)
+	} else {
+		fmt.Println("登录次数为:", signCount)
+	}
 	data := struct {
-		Name    string
-		Number  int
-		Score   int
-		Message string
+		Name      string
+		Number    int
+		Score     int
+		Message   string
+		SignCount int
 	}{
-		Name:    stu.Name,
-		Number:  stu.Number,
-		Score:   stu.Score,
-		Message: msg,
+		Name:      stu.Name,
+		Number:    stu.Number,
+		Score:     stu.Score,
+		Message:   msg,
+		SignCount: signCount,
 	}
 	tmpl, err := template.ParseFiles("module/templates/studentPage.html")
 	if err != nil {
@@ -305,8 +312,25 @@ func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := tmpl.Execute(w, data); err != nil {
 		log.Printf("模板渲染错误，err：%v\n", err)
-		http.Error(w, "模板执行错误", http.StatusInternalServerError)
+		//http.Error(w, "模板执行错误", http.StatusInternalServerError)
 	}
+}
+
+func getSignCount(rdb *redis.Client, studentID string, yearMonth string) (int, error) {
+	key := fmt.Sprintf("stu:sign:%s:%s", studentID, yearMonth)
+	ctx := context.Background()
+	result, err := rdb.Get(ctx, key).Result()
+	if err == redis.Nil {
+		return 0, nil
+	} else if err != nil {
+		return 0, err
+	}
+	signCount, err := strconv.Atoi(result)
+	if err != nil {
+		return 0, err
+	}
+
+	return signCount, err
 }
 
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
