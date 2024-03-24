@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 )
-
 func main() {
 	//rabbitmq
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
