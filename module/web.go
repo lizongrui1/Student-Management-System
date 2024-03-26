@@ -121,10 +121,12 @@ func MqHandler(conn *amqp.Connection, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		message := r.FormValue("message")
-		if err, _ := publishMessage(conn, message); err != nil {
+		if _, err := publishMessage(conn, message); err != nil {
 			http.Error(w, "消息发送失败", http.StatusInternalServerError)
 			return
 		}
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "消息发送成功")
 	} else {
 		http.ServeFile(w, r, "module/templates/sendMessage.html")
 	}

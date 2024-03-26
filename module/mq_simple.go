@@ -57,9 +57,12 @@ func ConsumerMessage(conn *amqp.Connection, chMsg chan string) {
 	if err != nil {
 		log.Fatalf("消费者创建失败：", err)
 	}
+	forever := make(chan bool)
 	go func() {
 		for msg := range msgs {
 			chMsg <- string(msg.Body)
 		}
 	}()
+
+	<-forever
 }
