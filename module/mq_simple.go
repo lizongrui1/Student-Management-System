@@ -29,8 +29,9 @@ func publishMessage(conn *amqp.Connection, message string) (*amqp.Channel, error
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(message),
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "text/plain",
+			Body:         []byte(message),
 		})
 	if err != nil {
 		return nil, fmt.Errorf("发送消息失败: %w", err)
