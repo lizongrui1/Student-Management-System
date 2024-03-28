@@ -56,7 +56,7 @@ func ConsumerMessage(conn *amqp.Connection, chMsg chan string) {
 		nil,
 	)
 	if err != nil {
-		log.Fatalf("消费者创建失败：", err)
+		log.Fatalf("消费者创建失败：%s\n", err)
 	}
 	forever := make(chan bool)
 	go func() {

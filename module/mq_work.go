@@ -38,6 +38,7 @@ func publishWorker(conn *amqp.Connection, message string) (*amqp.Channel, error)
 	if err != nil {
 		return nil, fmt.Errorf("发送消息失败: %w", err)
 	}
+	log.Printf(" [x] Sent %s", message)
 	return ch, nil
 }
 
@@ -85,6 +86,7 @@ func Worker(conn *amqp.Connection, chMsg chan string) {
 			time.Sleep(t * time.Second)
 			log.Printf("Done")
 			m.Ack(false)
+			chMsg <- string(m.Body)
 		}
 	}()
 	<-forever
