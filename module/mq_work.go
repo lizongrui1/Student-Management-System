@@ -1,8 +1,11 @@
 package module
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/streadway/amqp"
+	"log"
+	"time"
 )
 
 func publishWorker(conn *amqp.Connection, message string) (*amqp.Channel, error) {
@@ -28,8 +31,9 @@ func publishWorker(conn *amqp.Connection, message string) (*amqp.Channel, error)
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(message),
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "text/plain",
+			Body:         []byte(message),
 		})
 	if err != nil {
 		return nil, fmt.Errorf("发送消息失败: %w", err)
@@ -43,7 +47,7 @@ func Worker(conn *amqp.Connection, chMsg chan string) {
 		fmt.Printf("通道创建失败，err：%s\n", err)
 		return
 	}
-	msgs, err := ch.QueueDeclare(
+	q, err := ch.QueueDeclare(
 		"work",
 		true,
 		false,
@@ -59,5 +63,29 @@ func Worker(conn *amqp.Connection, chMsg chan string) {
 		fmt.Printf("ch.Qos创建失败，err：%s\n", err)
 		return
 	}
-	msgs, err = ch.Consume()
+	msgs, err := ch.Consume(
+		q.Name,
+		"",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		fmt.Printf("ch.Consume 创建失败，err: %s\n", err)
+		return
+	}
+	forever := make(chan bool)
+	go func() {
+		for m := range msgs {
+			log.Printf("已接收到消息： %s\n", m.Body)
+			dotCount := bytes.Count(m.Body, []byte("."))
+			t := time.Duration(dotCount)
+			time.Sleep(t * time.Second)
+			log.Printf("Done")
+			m.Ack(false)
+		}
+	}()
+	<-forever
 }

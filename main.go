@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 )
+
 func main() {
 	//rabbitmq
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
@@ -18,7 +19,7 @@ func main() {
 	defer conn.Close()
 
 	chMsg := make(chan string)
-	go module.ConsumerMessage(conn, chMsg)
+	go module.Worker(conn, chMsg)
 
 	//mysql
 	db, err := module.InitDB()
@@ -94,7 +95,7 @@ func main() {
 		case msg := <-chMsg:
 			fmt.Fprintln(w, msg)
 		default:
-			fmt.Fprintln(w, "没有消息")
+			fmt.Fprintln(w, "没有新消息")
 		}
 	})
 	http.HandleFunc("/integral", module.ShowStudentHandler)
