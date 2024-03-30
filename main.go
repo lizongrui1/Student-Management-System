@@ -82,7 +82,7 @@ func main() {
 	http.HandleFunc("/update", module.UpdateRowHandler)
 	http.HandleFunc("/delete", module.DeleteRowHandler)
 	http.HandleFunc("/register", module.RegisterStudentHandler)
-	http.HandleFunc("/studentPage", module.StudentPageHandler)
+	http.HandleFunc("/studentPage", module.StudentPageHandler(conn, chMsg))
 	http.HandleFunc("/studentSelect", func(w http.ResponseWriter, r *http.Request) {
 		module.StudentSelectHandler(w, r, db, rdb)
 	})

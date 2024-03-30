@@ -218,103 +218,107 @@ func renderTemplate(w http.ResponseWriter, data interface{}) {
 	}
 }
 
-func StudentPageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "只允许GET方法", http.StatusMethodNotAllowed)
-		return
-	}
-	// 尝试从Cookie获取学生ID
-	cookie, err := r.Cookie("student_id")
-	if err != nil {
-		http.Error(w, "未授权访问", http.StatusUnauthorized)
-		return
-	}
-
-	studentID, err := strconv.ParseInt(cookie.Value, 10, 64)
-	if err != nil {
-		http.Error(w, "无效的学生ID", http.StatusBadRequest)
-		return
-	}
-
-	favoriteTeacher := r.URL.Query().Get("favoriteTeacher")
-	if favoriteTeacher != "" {
-		//var tid int64
-		switch favoriteTeacher {
-		case "math":
-			tid = 1
-		case "chinese":
-			tid = 2
-		case "english":
-			tid = 3
+func StudentPageHandler(conn *amqp.Connection, chMsg chan string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "只允许GET方法", http.StatusMethodNotAllowed)
+			return
 		}
-
-		_, err = GiveLike(ctx, tid, studentID)
+		// 尝试从Cookie获取学生ID
+		cookie, err := r.Cookie("student_id")
 		if err != nil {
-			http.Error(w, fmt.Sprintf("保存投票结果失败：%v", err), http.StatusInternalServerError)
+			http.Error(w, "未授权访问", http.StatusUnauthorized)
 			return
 		}
 
-		alreadyLiked, err := GiveLikeSelect(tid, studentID)
+		studentID, err := strconv.ParseInt(cookie.Value, 10, 64)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("查询点赞状态失败：%v", err), http.StatusInternalServerError)
+			http.Error(w, "无效的学生ID", http.StatusBadRequest)
 			return
 		}
-		if alreadyLiked {
-			fmt.Fprintf(w, "你已经给这位老师投过票了")
+
+		favoriteTeacher := r.URL.Query().Get("favoriteTeacher")
+		if favoriteTeacher != "" {
+			//var tid int64
+			switch favoriteTeacher {
+			case "math":
+				tid = 1
+			case "chinese":
+				tid = 2
+			case "english":
+				tid = 3
+			}
+
+			_, err = GiveLike(ctx, tid, studentID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("保存投票结果失败：%v", err), http.StatusInternalServerError)
+				return
+			}
+
+			alreadyLiked, err := GiveLikeSelect(tid, studentID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("查询点赞状态失败：%v", err), http.StatusInternalServerError)
+				return
+			}
+			if alreadyLiked {
+				fmt.Fprintf(w, "你已经给这位老师投过票了")
+				return
+			}
+		}
+
+		cookie, err = r.Cookie("student_id")
+		if err != nil {
+			http.Error(w, "未授权访问", http.StatusUnauthorized)
 			return
 		}
-	}
+		number, err := strconv.Atoi(cookie.Value)
+		if err != nil {
+			http.Error(w, "无效的学生ID", http.StatusBadRequest)
+			return
+		}
+		stu, err := queryRow(number)
+		if err != nil {
+			log.Printf("查询失败，err：%v\n", err)
+			http.Error(w, "查询失败", http.StatusInternalServerError)
+			return
+		}
 
-	cookie, err = r.Cookie("student_id")
-	if err != nil {
-		http.Error(w, "未授权访问", http.StatusUnauthorized)
-		return
-	}
-	number, err := strconv.Atoi(cookie.Value)
-	if err != nil {
-		http.Error(w, "无效的学生ID", http.StatusBadRequest)
-		return
-	}
-	stu, err := queryRow(number)
-	if err != nil {
-		log.Printf("查询失败，err：%v\n", err)
-		http.Error(w, "查询失败", http.StatusInternalServerError)
-		return
-	}
+		lastMessageMutex.Lock()
+		msg := lastMessage
+		lastMessageMutex.Unlock()
 
-	lastMessageMutex.Lock()
-	msg := lastMessage
-	lastMessageMutex.Unlock()
+		signCount, err := getSignCount(rdb, strconv.Itoa(stu.Number), "2024-03")
+		if err != nil {
+			fmt.Println("登录次数计算失败:", err)
+		} else {
+			fmt.Println("登录次数为:", signCount)
+		}
+		data := struct {
+			Name      string
+			Number    int
+			Score     int
+			Message   string
+			SignCount int
+		}{
+			Name:      stu.Name,
+			Number:    stu.Number,
+			Score:     stu.Score,
+			Message:   msg,
+			SignCount: signCount,
+		}
+		tmpl, err := template.ParseFiles("module/templates/studentPage.html")
+		if err != nil {
+			log.Printf("模板解析错误：%v\n", err)
+			http.Error(w, "内部服务器错误", http.StatusInternalServerError)
+			return
+		}
 
-	signCount, err := getSignCount(rdb, strconv.Itoa(stu.Number), "2024-03")
-	if err != nil {
-		fmt.Println("登录次数计算失败:", err)
-	} else {
-		fmt.Println("登录次数为:", signCount)
-	}
-	data := struct {
-		Name      string
-		Number    int
-		Score     int
-		Message   string
-		SignCount int
-	}{
-		Name:      stu.Name,
-		Number:    stu.Number,
-		Score:     stu.Score,
-		Message:   msg,
-		SignCount: signCount,
-	}
-	tmpl, err := template.ParseFiles("module/templates/studentPage.html")
-	if err != nil {
-		log.Printf("模板解析错误：%v\n", err)
-		http.Error(w, "内部服务器错误", http.StatusInternalServerError)
-		return
-	}
-
-	if err := tmpl.Execute(w, data); err != nil {
-		log.Printf("模板渲染错误，err：%v\n", err)
-		//http.Error(w, "模板执行错误", http.StatusInternalServerError)
+		if err := tmpl.Execute(w, data); err != nil {
+			log.Printf("模板渲染错误，err：%v\n", err)
+			//http.Error(w, "模板执行错误", http.StatusInternalServerError)
+		}
+		// 启动一个新的goroutine来运行Worker函数？？？
+		go Receive(conn, chMsg)
 	}
 }
 
