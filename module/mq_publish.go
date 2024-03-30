@@ -11,7 +11,7 @@ func emit(conn *amqp.Connection, message string) (*amqp.Channel, error) {
 	if err != nil {
 		return nil, fmt.Errorf("创建通道失败: %w", err)
 	}
-	defer ch.Close()
+	//defer ch.Close()
 	err = ch.ExchangeDeclare(
 		"logs",
 		"fanout",
@@ -31,11 +31,10 @@ func emit(conn *amqp.Connection, message string) (*amqp.Channel, error) {
 	return ch, nil
 }
 
-func receive(conn *amqp.Connection, chMsg chan string) {
+func Receive(conn *amqp.Connection, chMsg chan string) error {
 	ch, err := conn.Channel()
 	if err != nil {
-		fmt.Errorf("创建通道失败: %w", err)
-		return
+		return fmt.Errorf("创建通道失败: %w", err)
 	}
 	defer ch.Close()
 	err = ch.ExchangeDeclare(
@@ -58,7 +57,7 @@ func receive(conn *amqp.Connection, chMsg chan string) {
 	)
 	if err != nil {
 		fmt.Printf("队列声明失败，err：%s\n", err)
-		return
+		return nil
 	}
 	err = ch.QueueBind(
 		q.Name,
@@ -82,7 +81,9 @@ func receive(conn *amqp.Connection, chMsg chan string) {
 	go func() {
 		for m := range msgs {
 			log.Printf(" [x] %s", m.Body)
+			chMsg <- string(m.Body)
 		}
 	}()
 	<-forever
+	return nil
 }

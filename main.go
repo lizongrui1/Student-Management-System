@@ -19,7 +19,7 @@ func main() {
 	defer conn.Close()
 
 	chMsg := make(chan string)
-	go module.Worker(conn, chMsg)
+	go module.Receive(conn, chMsg)
 
 	//mysql
 	db, err := module.InitDB()
