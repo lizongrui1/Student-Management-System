@@ -6,40 +6,41 @@ import (
 	"log"
 )
 
-func emit(conn *amqp.Connection, message string) (*amqp.Channel, error) {
+func emitTopic(conn *amqp.Connection, message string) (*amqp.Channel, error) {
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, fmt.Errorf("创建通道失败: %w", err)
 	}
-	//defer ch.Close()
 	err = ch.ExchangeDeclare(
-		"logs",
-		"fanout",
+		"stu_topic",
+		"topic",
 		true,
 		false,
 		false,
 		false,
-		nil)
+		nil,
+	)
 	failOnError(err, "创建交换器失败")
 	err = ch.Publish(
-		"logs",
-		"",
+		"stu_topic",
+		"course.english",
 		false,
 		false,
-		amqp.Publishing{ContentType: "text/plain", Body: []byte(message)})
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        []byte(message)})
 	failOnError(err, "发送消息失败")
 	return ch, nil
 }
 
-func Receive(conn *amqp.Connection, chMsg chan string) error {
+func ReceiveTopic(conn *amqp.Connection, chMsg chan string) error {
 	ch, err := conn.Channel()
 	if err != nil {
 		return fmt.Errorf("创建通道失败: %w", err)
 	}
-	//defer ch.Close()
 	err = ch.ExchangeDeclare(
-		"logs",
-		"fanout",
+		"stu_topic",
+		"topic",
 		true,
 		false,
 		false,
@@ -61,8 +62,8 @@ func Receive(conn *amqp.Connection, chMsg chan string) error {
 	}
 	err = ch.QueueBind(
 		q.Name,
-		"",
-		"logs",
+		"*.english",
+		"stu_topic",
 		false,
 		nil,
 	)
@@ -80,7 +81,7 @@ func Receive(conn *amqp.Connection, chMsg chan string) error {
 	forever := make(chan bool)
 	go func() {
 		for m := range msgs {
-			log.Printf(" [x] %s", m.Body)
+			log.Printf("%s", m.Body)
 			chMsg <- string(m.Body)
 		}
 	}()

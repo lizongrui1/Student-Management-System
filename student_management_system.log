@@ -541,3 +541,7 @@ created by net/http.(*Server).Serve in goroutine 1
 2024/03/30 17:28:38  [x] hello111
 2024/03/30 17:28:38  [x] hello111
 2024/03/30 17:28:38  [x] hello111
+2024/04/01 20:42:00 someFunction failed:绑定队列失败,Exception (404) Reason: "NOT_FOUND - no exchange 'logs_topic' in vhost '/'"
+2024/04/01 20:42:18 someFunction failed:绑定队列失败,Exception (404) Reason: "NOT_FOUND - no exchange 'logs_topic' in vhost '/'"
+2024/04/01 20:46:07  [x] hello
+2024/04/01 20:46:25  [x] hello111
